@@ -1,1 +1,0 @@
-This is the repo for trustworthy retrieval augmented chatbot.
