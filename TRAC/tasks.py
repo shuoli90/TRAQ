@@ -2,9 +2,9 @@ from datasets import load_dataset
 from dataclasses import dataclass
 from typing import List
 import numpy as np
+import json
+from kilt import kilt_utils as utils
 import logging
-from kilt.knowledge_source import KnowledgeSource
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -20,42 +20,48 @@ class Sample:
 
 class RQA:
     def __init__(self, task='nq') -> None:
+        with open("kilt/configs/dev_data.json", "r") as fin:
+            self.dev_config_json = json.load(fin)
         self.task = task
-        self.load_dataset()
-        self.ks = KnowledgeSource()
-
+        self.query_data, self.validated_data, self.elements = self.load_dataset()
+    
     def load_dataset(self) -> None:
-        self.corpus = load_dataset("kilt_wikipedia", cache_dir="/data3/shuoli/data/")['full']
-        kilt_nq = load_dataset("kilt_tasks", self.task, 'validation', cache_dir="/data3/shuoli/data/")['validation']
-        self.samples = [self.build_sample(example) for example in kilt_nq]
+        for task_family, datasets in self.dev_config_json.items():
+            for dataset_name, dataset_file in datasets.items():
+                if dataset_name == self.task:
+                    raw_data = utils.load_data(dataset_file)
 
-    def build_sample(self, example) -> Sample:
-        question = example["input"].strip()
-        context_texts = [
-            [ctx['wikipedia_id'] for ctx in context['provenance']]
-            for context in example['output']
-        ]
-        paragraphs = [
-            [[ctx['start_paragraph_id'], ctx['end_paragraph_id']] for ctx in context['provenance']]
-            for context in example['output']
-        ]
-        reference_answers = [
-            context['answer']
-            for context in example['output']
-        ]
-        return Sample(question=question, context=context_texts, 
-                      paragraphs=paragraphs, answer=reference_answers)
+                    # consider only valid data - filter out invalid
+                    validated_data = {}
+                    query_data = []
+                    elements = []
+                    for element in raw_data:
+                        elements.append(element)
+                        # if utils.validate_datapoint(element, logger=None):
+                        if element["id"] in validated_data:
+                            raise ValueError("ids are not unique in input data!")
+                        validated_data[element["id"]] = element
+                        query_data.append(
+                            {"query": element["input"], "id": element["id"]}
+                        )
+                    return query_data, validated_data, elements
 
-    def sample_subset(self, num=100, exclude=None):
-        samples = self.samples
-        lens = len(samples)
-        index = np.random.permutation(lens).tolist()[:num if exclude is None else num+1]
-        if exclude is not None and exclude in index:
-            index.remove(exclude)
-        else:
-            index = index[:num]
-        return [samples[i] for i in index]
-
-    # get the context text from the context id
-    def get_context_text(self, context_id):
-        return self.ks.get_page_by_id(context_id)['text']
+class RQA_dpr:
+    def __init__(self, task='nq') -> None:
+        self.task = task
+        self.query_data, self.validated_data, self.elements = self.load_dataset()
+    
+    def load_dataset(self) -> None:
+        with open("data/biencoder-nq-dev.json", "r") as fin:
+            nq_dpr = json.load(fin)
+        
+        elements = []
+        query_data = []
+        validated_data = {}
+        for idx, record in enumerate(nq_dpr):
+            elements.append(record)
+            validated_data[idx] = record
+            query_data.append(
+                {"query": record["question"], "id": idx}
+            )
+        return query_data, validated_data, elements

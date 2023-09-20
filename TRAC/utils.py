@@ -14,6 +14,7 @@ import backoff
 from transformers import AutoTokenizer, RagRetriever
 from transformers import RagModel
 import json
+import random
 
 def separate_sentences(paragraph):
     # Split the paragraph into sentences using commas and periods, keeping the punctuation
@@ -316,20 +317,20 @@ def completions_with_backoff(**kwargs):
     return openai.Completion.create(**kwargs)
 
 
-def ask_chatgpt(question, context, 
+def ask_completion(prompt, 
                 model='davinci', temperature=1.0):
 
     # Combine the context and question into a single prompt
     # prompt = f"Evidence: {context}\nQuestion: {question}\nAnswer:"
     # prompt = few_shot + '\n\n' + prompt
 
-    question += '?'
-    prompt = f""" Answer the following question based on the given context; \
-            Answer "I don't know" if you don't know the answer; \
-            Answer the question using only one keyword. \
-            Question: {question}
-            Context: {context}
-            Answer: """
+    # question += '?'
+    # prompt = f""" Answer the following question based on the given context; \
+    #         Answer "I don't know" if you don't know the answer; \
+    #         Answer the question using only one keyword. \
+    #         Question: {question}
+    #         Context: {context}
+    #         Answer: """
 
     if model == 'davinci':
         engine = 'text-davinci-003'
@@ -392,6 +393,64 @@ def ask_chatgpt_clusterring(question, context,
     return choices, probs
 
 
+def get_prompt_template(question, context, task='nq', ):
+
+    # Combine the context and question into a single prompt
+    # prompt = f"Evidence: {context}\nQuestion: {question}\nAnswer:"
+    # prompt = few_shot + '\n\n' + prompt
+
+    if task in ['Natural Questions', 'TriviaQA']:
+        prompt = f"""Answer the following question based on the given context; Answer the question shortly.
+                Question: '''{question}'''
+                Context: '''{context}'''
+                Answer:
+                """
+    elif task == 'fever':
+        prompt = f"""Answer the following question based on the given context; Answer "Support" if the context supports the claim or "Refutes".
+                Claim: '''{question}'''
+                Context: '''{context}'''
+                Answer:
+                """
+    return prompt
+
+def get_prompt_template_wo(question, task='nq', ):
+
+
+    if task in ['Natural Questions', 'TriviaQA']:
+        prompt = f"""Answer the following question; Answer the question shortly.
+                Question: '''{question}'''
+                Answer:
+                """
+    elif task == 'fever':
+        prompt = f"""Answer the following question; Answer "Support" if the context supports the claim or "Refutes".
+                Claim: '''{question}'''
+                Answer:
+                """
+    return prompt
+
+
+def ask_chatgpt(prompt,
+                   model="gpt-3.5-turbo",
+                   temperature=1.0,
+                   max_token=20,
+                   n_answers=5):
+
+    messages = [{"role": "user",
+                 "content": prompt}]
+    response = chatcompletions_with_backoff(
+        model=model,
+        messages=messages,
+        temperature=temperature,  # this is the degree of randomness of the model's output
+        n=n_answers  # how many different answers to return
+    )
+
+    choices = [choice.message['content'].strip()
+               for choice
+               in response.choices]
+
+    # return response.choices[0].message["content"]
+    return choices
+
 def get_completion(question, context,
                    model="gpt-3.5-turbo",
                    temperature=1.0,
@@ -424,6 +483,34 @@ def get_completion(question, context,
 
     # return response.choices[0].message["content"]
     return choices
+
+def processing_answers(semantic_clusterring, semantic_probs,
+                       item_occurance, reference_answers, 
+                       scorer, metric='rouge1', 
+                       threshold=0.5, thr_qa=0.0):
+        
+    true_scores = []
+    matched_answers = []
+    semantics = []
+    for predicted_answer in semantic_clusterring.keys():
+        concept_id = semantic_clusterring[predicted_answer]
+        repeat = item_occurance[predicted_answer]
+        prob = semantic_probs[concept_id]
+        if prob >= thr_qa:
+            semantics.extend([predicted_answer] * repeat)
+            for reference_answer in reference_answers:
+                scores = scorer.score(reference_answer, predicted_answer)
+                if metric == "rouge1":
+                    scores = scores['rouge1'][2]
+                else:
+                    scores = scores['rougeL'][2]
+                if scores > threshold:
+                    true_scores.extend([prob] * repeat)
+                    matched_answers.append(predicted_answer)
+                    break
+            # else:
+            #     true_scores.extend([0.0] * repeat)
+    return true_scores, matched_answers, semantics
 
 
 def get_completion_clusterring(
@@ -468,22 +555,6 @@ def get_completion_clusterring(
     # return response.choices[0].message["content"]
     return semantic_clusterring, semantic_probs, item_occurance
 
-
-# def load_natural_questions_dataset(split):
-#     dataset = load_dataset(
-#         "natural_questions",
-#         split=split,
-#         beam_runner="DirectRunner",
-#         beam_options=PipelineOptions(
-#             [
-#                 "--direct_num_workers=4",
-#                 "--direct_running_mode=multi_threading",
-#             ]
-#         ),
-#         cache_dir="/data3/shuoli/data/",
-#         # ignore_verifications=True
-#     )
-#     return dataset
 
 
 def load_hotpotqa_dataset(split, config='fullwiki'):
@@ -615,3 +686,77 @@ def save_results(args, cosines, innerproducts, contexts, answers_list, indices):
                     'collected', filepath), "w") as f:
             for item in answers_list:
                 f.write(json.dumps(item) + "\n")
+    
+
+def intersection(lst1, lst2):
+    return list(set(lst1) & set(lst2))
+
+
+def convert_list_to_dict(retrieved):
+    convert = {}
+    for item in retrieved:
+        convert[item['wikipedia_id']] = float(item['score'])
+    return convert
+
+def split(scores, indices):
+    return [score for idx, score in enumerate(scores) if idx in indices]
+
+def compute_threshold(scores, alpha, portion=0.5, shuffle=True):
+    scores_tmp = []
+    for score in scores:
+        scores_tmp.extend(score)
+    scores = scores_tmp
+    
+    if shuffle:
+        random.shuffle(scores)
+    cal = scores[:int(len(scores)*portion)]
+    test = scores[int(len(scores)*(1-portion)):]
+    
+    thr_most_relevant = np.quantile(cal, alpha, interpolation='higher')
+    print(f"Most relevant threshold: {thr_most_relevant}")
+    test = np.array(test)
+    coverage_most_relevant = np.mean(test >= thr_most_relevant)
+    print(f"Most relevant coverage: {coverage_most_relevant}")
+
+    return thr_most_relevant
+
+def dataset_info(element):
+    query = element['question']
+    answer = [ans for ans in element['answers']]
+    passage_id = [ctx['passage_id'] for ctx in element['positive_ctxs']]
+    passage_title = [ctx['title'] for ctx in element['positive_ctxs']]
+    passage_text = [ctx['text'] for ctx in element['positive_ctxs']]
+    return query, answer, passage_id, passage_title, passage_text
+
+
+def retrieved_info(score, retrieved, passage_id):
+    retrieved_ids = retrieved['id'][:20]
+    retrieved_texts = retrieved['text'][:20]
+    retrieved_title = retrieved['title'][:20]
+    true_score = [s for s, retrieved_id in zip(score, retrieved_ids) if retrieved_id == passage_id]
+    return retrieved_ids, retrieved_texts, retrieved_title, true_score
+
+def ask(query, passage_text, chat=False, task="Natural Questions"):
+    prompt = get_prompt_template(query, passage_text, task=task)
+    if chat:
+        sequences = ask_chatgpt(prompt, n_answers=30)
+    else:
+        sequences, probs = ask_chatgpt(prompt, n_answers=30)
+    return sequences, prompt
+
+def clustering(sequences, prompt=None, semantic_model=None, semantic_tokenizer=None, scorer=None, semantic=False):
+    if semantic:
+            semantic_set_ids, semantic_probs, item_occurance = \
+                compute_semantic_clusterring(
+                    semantic_model, 
+                    semantic_tokenizer,
+                    prompt,
+                    sequences,
+                )
+    else:
+        semantic_set_ids, semantic_probs, item_occurance = \
+            compute_keyword_clusterring(
+                sequences,
+                scorer
+            )
+    return semantic_set_ids, semantic_probs, item_occurance
