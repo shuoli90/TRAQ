@@ -15,6 +15,7 @@ from transformers import AutoTokenizer, RagRetriever
 from transformers import RagModel
 import json
 import random
+# from gensim.summarization.bm25 import BM25
 
 def separate_sentences(paragraph):
     # Split the paragraph into sentences using commas and periods, keeping the punctuation
@@ -399,18 +400,18 @@ def get_prompt_template(question, context, task='nq', ):
     # prompt = f"Evidence: {context}\nQuestion: {question}\nAnswer:"
     # prompt = few_shot + '\n\n' + prompt
 
-    if task in ['Natural Questions', 'TriviaQA']:
-        prompt = f"""Answer the following question based on the given context; Answer the question shortly.
-                Question: '''{question}'''
-                Context: '''{context}'''
-                Answer:
-                """
-    elif task == 'fever':
-        prompt = f"""Answer the following question based on the given context; Answer "Support" if the context supports the claim or "Refutes".
-                Claim: '''{question}'''
-                Context: '''{context}'''
-                Answer:
-                """
+    # if task in ['Natural Questions', 'TriviaQA']:
+    prompt = f"""Answer the following question based on the given context; Answer the question shortly.
+            Question: '''{question}'''
+            Context: '''{context}'''
+            Answer:
+            """
+    # elif task == 'fever':
+    #     prompt = f"""Answer the following question based on the given context; Answer "Support" if the context supports the claim or "Refutes".
+    #             Claim: '''{question}'''
+    #             Context: '''{context}'''
+    #             Answer:
+    #             """
     return prompt
 
 def get_prompt_template_wo(question, task='nq', ):
@@ -601,7 +602,7 @@ def _normalize_answer(s):
     return white_space_fix(remove_articles(remove_punc(lower(s))))
 
 
-def has_answer(answers, text, tokenizer, match_type) -> bool:
+def has_answer(answers, text, match_type='string') -> bool:
     """Check if a document contains an answer string.
     If `match_type` is string,
     token matching is done between the text and answer.
@@ -611,13 +612,8 @@ def has_answer(answers, text, tokenizer, match_type) -> bool:
     text = _normalize_answer(text)
 
     if match_type == "string":
-        # Answer is a list of possible strings
-        # text = tokenizer.tokenize(text).words(uncased=True)
 
         for single_answer in answers:
-            # single_answer = _normalize(single_answer)
-            # single_answer = tokenizer.tokenize(single_answer)
-            # single_answer = single_answer.words(uncased=True)
             single_answer = _normalize_answer(single_answer)
 
             for i in range(0, len(text) - len(single_answer) + 1):
@@ -686,7 +682,6 @@ def save_results(args, cosines, innerproducts, contexts, answers_list, indices):
                     'collected', filepath), "w") as f:
             for item in answers_list:
                 f.write(json.dumps(item) + "\n")
-    
 
 def intersection(lst1, lst2):
     return list(set(lst1) & set(lst2))
@@ -702,37 +697,40 @@ def split(scores, indices):
     return [score for idx, score in enumerate(scores) if idx in indices]
 
 def compute_threshold(scores, alpha, portion=0.5, shuffle=True):
-    scores_tmp = []
-    for score in scores:
-        scores_tmp.extend(score)
-    scores = scores_tmp
+    # scores_tmp = []
+    # for score in scores:
+    #     scores_tmp.extend(score)
+    # scores = scores_tmp
     
-    if shuffle:
-        random.shuffle(scores)
-    cal = scores[:int(len(scores)*portion)]
-    test = scores[int(len(scores)*(1-portion)):]
+    # if shuffle:
+    #     random.shuffle(scores)
+    # cal = scores[:int(len(scores)*portion)]
+    # test = scores[int(len(scores)*(1-portion)):]
     
-    thr_most_relevant = np.quantile(cal, alpha, interpolation='higher')
-    print(f"Most relevant threshold: {thr_most_relevant}")
-    test = np.array(test)
-    coverage_most_relevant = np.mean(test >= thr_most_relevant)
-    print(f"Most relevant coverage: {coverage_most_relevant}")
+    thr_most_relevant = np.quantile(scores, alpha, interpolation='higher')
+    # print(f"Most relevant threshold: {thr_most_relevant}")
+    # test = np.array(test)
+    # coverage_most_relevant = np.mean(test >= thr_most_relevant)
+    # print(f"Most relevant coverage: {coverage_most_relevant}")
 
     return thr_most_relevant
 
-def dataset_info(element):
+def dataset_info(element, dataset='nq'):
     query = element['question']
     answer = [ans for ans in element['answers']]
-    passage_id = [ctx['passage_id'] for ctx in element['positive_ctxs']]
+    if dataset == 'nq':
+        passage_id = [ctx['passage_id'] for ctx in element['positive_ctxs']]
+    else:
+        passage_id = [ctx['psg_id'] for ctx in element['positive_ctxs']]
     passage_title = [ctx['title'] for ctx in element['positive_ctxs']]
     passage_text = [ctx['text'] for ctx in element['positive_ctxs']]
     return query, answer, passage_id, passage_title, passage_text
 
 
 def retrieved_info(score, retrieved, passage_id):
-    retrieved_ids = retrieved['id'][:20]
-    retrieved_texts = retrieved['text'][:20]
-    retrieved_title = retrieved['title'][:20]
+    retrieved_ids = retrieved['id']
+    retrieved_texts = retrieved['text']
+    retrieved_title = retrieved['title']
     true_score = [s for s, retrieved_id in zip(score, retrieved_ids) if retrieved_id == passage_id]
     return retrieved_ids, retrieved_texts, retrieved_title, true_score
 
@@ -760,3 +758,15 @@ def clustering(sequences, prompt=None, semantic_model=None, semantic_tokenizer=N
                 scorer
             )
     return semantic_set_ids, semantic_probs, item_occurance
+
+import pickle
+def write_list(a_list, file_name):
+    # store list in binary file so 'wb' mode
+    with open(file_name, 'wb') as fp:
+        pickle.dump(a_list, fp)
+        print('Done writing list into a binary file')
+def read_list(file_name):
+    # for reading also binary mode is important
+    with open(file_name, 'rb') as fp:
+        n_list = pickle.load(fp)
+        return n_list

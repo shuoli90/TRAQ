@@ -48,13 +48,14 @@ class RQA:
 
 class RQA_dpr:
     def __init__(self, task='nq') -> None:
+        assert task in ['nq', 'trivia', 'squad1']
         self.task = task
         self.query_data, self.validated_data, self.elements = self.load_dataset()
-    
+
     def load_dataset(self) -> None:
-        with open("data/biencoder-nq-dev.json", "r") as fin:
+        with open(f"data/biencoder-{self.task}-dev.json", "r") as fin:
             nq_dpr = json.load(fin)
-        
+
         elements = []
         query_data = []
         validated_data = {}
