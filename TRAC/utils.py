@@ -15,7 +15,12 @@ from transformers import AutoTokenizer, RagRetriever
 from transformers import RagModel
 import json
 import random
-# from gensim.summarization.bm25 import BM25
+import time
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_random_exponential,
+)  # for exponential backoff
 
 def separate_sentences(paragraph):
     # Split the paragraph into sentences using commas and periods, keeping the punctuation
@@ -308,30 +313,20 @@ def compute_keyword_clusterring(answers,
     return semantic_set_ids, semantic_probs, item_occurance
 
 
-@backoff.on_exception(backoff.expo, (openai.error.RateLimitError, openai.error.APIError))
+# @backoff.on_exception(backoff.expo, (openai.error.RateLimitError, openai.error.APIError))
+@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
 def chatcompletions_with_backoff(**kwargs):
     return openai.ChatCompletion.create(**kwargs)
 
 
-@backoff.on_exception(backoff.expo, (openai.error.RateLimitError, openai.error.APIError))
+# @backoff.on_exception(backoff.expo, (openai.error.RateLimitError, openai.error.APIError))
+@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
 def completions_with_backoff(**kwargs):
     return openai.Completion.create(**kwargs)
 
 
 def ask_completion(prompt, 
                 model='davinci', temperature=1.0):
-
-    # Combine the context and question into a single prompt
-    # prompt = f"Evidence: {context}\nQuestion: {question}\nAnswer:"
-    # prompt = few_shot + '\n\n' + prompt
-
-    # question += '?'
-    # prompt = f""" Answer the following question based on the given context; \
-    #         Answer "I don't know" if you don't know the answer; \
-    #         Answer the question using only one keyword. \
-    #         Question: {question}
-    #         Context: {context}
-    #         Answer: """
 
     if model == 'davinci':
         engine = 'text-davinci-003'
@@ -431,7 +426,7 @@ def get_prompt_template_wo(question, task='nq', ):
 
 
 def ask_chatgpt(prompt,
-                   model="gpt-3.5-turbo",
+                   model="gpt-3.5-turbo-0613",
                    temperature=1.0,
                    max_token=20,
                    n_answers=5):
@@ -448,42 +443,45 @@ def ask_chatgpt(prompt,
     choices = [choice.message['content'].strip()
                for choice
                in response.choices]
+    input_token_counts = response.usage['prompt_tokens']
+    output_token_counts = response.usage['completion_tokens']
 
     # return response.choices[0].message["content"]
-    return choices
+    return choices, input_token_counts, output_token_counts
 
-def get_completion(question, context,
-                   model="gpt-3.5-turbo",
-                   temperature=1.0,
-                   max_token=20,
-                   n_answers=5):
-    question += '?'
-    prompt = f""" Answer the following question based on the given context; \
-            Answer "I don't know" if you don't know the answer; \
-            Answer the question using only one keyword. \
-            Question: {question}
-            Context: {context}
-            Answer: """
-    messages = [{"role": "user",
-                 "content": prompt}]
-    response = chatcompletions_with_backoff(
-        model=model,
-        messages=messages,
-        temperature=temperature,  # this is the degree of randomness of the model's output
-        n=n_answers  # how many different answers to return
-    )
-    # choices = []
-    # for choice in response.choices:
-    #     choice_text = choice.message['content'].strip()
-    #     if choice_text not in choices:
-    #         choices.append(choice_text)
+# def get_completion(question, context,
+#                    model="gpt-3.5-turbo",
+#                    temperature=1.0,
+#                    max_token=20,
+#                    n_answers=5):
+#     question += '?'
+#     prompt = f""" Answer the following question based on the given context; \
+#             Answer "I don't know" if you don't know the answer; \
+#             Answer the question using only one keyword. \
+#             Question: {question}
+#             Context: {context}
+#             Answer: """
+#     messages = [{"role": "user",
+#                  "content": prompt}]
+#     response = chatcompletions_with_backoff(
+#         model=model,
+#         messages=messages,
+#         temperature=temperature,  # this is the degree of randomness of the model's output
+#         n=n_answers  # how many different answers to return
+#     )
+#     # choices = []
+#     # for choice in response.choices:
+#     #     choice_text = choice.message['content'].strip()
+#     #     if choice_text not in choices:
+#     #         choices.append(choice_text)
 
-    choices = [choice.message['content'].strip()
-               for choice
-               in response.choices]
+#     choices = [choice.message['content'].strip()
+#                for choice
+#                in response.choices]
+#     token_count = response.usage['total_tokens']
 
-    # return response.choices[0].message["content"]
-    return choices
+#     # return response.choices[0].message["content"]
+#     return choices, token_count
 
 def processing_answers(semantic_clusterring, semantic_probs,
                        item_occurance, reference_answers, 
@@ -514,47 +512,47 @@ def processing_answers(semantic_clusterring, semantic_probs,
     return true_scores, matched_answers, semantics
 
 
-def get_completion_clusterring(
-        question, context,
-        semantic_model, semantic_tokenizer,
-        scorer,
-        model="gpt-3.5-turbo",
-        temperature=1.0,
-        max_token=20,
-        n_answers=5, semantic=False):
-    question += '?'
-    prompt = f""" Answer the following question based on the given context; \
-            Answer "I don't know" if you don't know the answer; \
-            Answer the question using only one keyword. \
-            Question: {question}
-            Context: {context} 
-            Answer: """
-    messages = [{"role": "user", "content": prompt}]
-    response = chatcompletions_with_backoff(
-        model=model,
-        messages=messages,
-        temperature=temperature,  # this is the degree of randomness of the model's output
-        n=n_answers  # how many different answers to return
-    )
+# def get_completion_clusterring(
+#         question, context,
+#         semantic_model, semantic_tokenizer,
+#         scorer,
+#         model="gpt-3.5-turbo",
+#         temperature=1.0,
+#         max_token=20,
+#         n_answers=5, semantic=False):
+#     question += '?'
+#     prompt = f""" Answer the following question based on the given context; \
+#             Answer "I don't know" if you don't know the answer; \
+#             Answer the question using only one keyword. \
+#             Question: {question}
+#             Context: {context} 
+#             Answer: """
+#     messages = [{"role": "user", "content": prompt}]
+#     response = chatcompletions_with_backoff(
+#         model=model,
+#         messages=messages,
+#         temperature=temperature,  # this is the degree of randomness of the model's output
+#         n=n_answers  # how many different answers to return
+#     )
 
-    choices = [choice.message['content'].strip()
-               for choice
-               in response.choices]
-    if semantic:
-        semantic_clusterring, semantic_probs, item_occurance = \
-            compute_semantic_clusterring(
-                model=semantic_model,
-                tokenizer=semantic_tokenizer,
-                question=prompt, answers=choices,
-                scorer=scorer)
-    else:
-        semantic_clusterring, semantic_probs, item_occurance = \
-            compute_keyword_clusterring(
-                answers=choices,
-                scorer=scorer)
+#     choices = [choice.message['content'].strip()
+#                for choice
+#                in response.choices]
+#     if semantic:
+#         semantic_clusterring, semantic_probs, item_occurance = \
+#             compute_semantic_clusterring(
+#                 model=semantic_model,
+#                 tokenizer=semantic_tokenizer,
+#                 question=prompt, answers=choices,
+#                 scorer=scorer)
+#     else:
+#         semantic_clusterring, semantic_probs, item_occurance = \
+#             compute_keyword_clusterring(
+#                 answers=choices,
+#                 scorer=scorer)
 
-    # return response.choices[0].message["content"]
-    return semantic_clusterring, semantic_probs, item_occurance
+#     # return response.choices[0].message["content"]
+#     return semantic_clusterring, semantic_probs, item_occurance
 
 
 
