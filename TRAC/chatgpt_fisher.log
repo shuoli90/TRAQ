@@ -1,0 +1,154 @@
+Task=nq, alpha=0.2, seed=0, semantic=False
+Best fitness: 5.132890365448505
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.8
+Coverage 0.9079601990049752
+Average answer 209.40049751243782
+Average semantic 4.987562189054726
+
+
+Task=nq, alpha=0.2, seed=21, semantic=False
+Best fitness: 3.5548172757475083
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.8
+Coverage 0.8880597014925373
+Average answer 166.39800995024876
+Average semantic 3.5920398009950247
+
+
+Task=nq, alpha=0.2, seed=42, semantic=False
+Best fitness: 4.269102990033223
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.8
+Coverage 0.9228855721393034
+Average answer 201.0870646766169
+Average semantic 4.6840796019900495
+
+
+Task=trivia, alpha=0.2, seed=0, semantic=False
+Best fitness: 2.5633333333333335
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.8
+Coverage 0.87
+Average answer 186.225
+Average semantic 2.3175
+
+
+Task=trivia, alpha=0.2, seed=21, semantic=False
+Best fitness: 2.4266666666666667
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.8
+Coverage 0.8625
+Average answer 181.3225
+Average semantic 2.265
+
+
+Task=trivia, alpha=0.2, seed=42, semantic=False
+Best fitness: 2.4966666666666666
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.8
+Coverage 0.8875
+Average answer 206.3325
+Average semantic 2.65
+
+
+Task=squad1, alpha=0.2, seed=0, semantic=False
+Best fitness: 5.774086378737541
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.8
+Coverage 0.9104477611940298
+Average answer 237.36069651741295
+Average semantic 5.982587064676617
+
+
+Task=squad1, alpha=0.2, seed=21, semantic=False
+Best fitness: 4.883720930232558
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.8
+Coverage 0.9253731343283582
+Average answer 223.8507462686567
+Average semantic 5.206467661691542
+
+
+Task=squad1, alpha=0.2, seed=42, semantic=False
+Best fitness: 6.780730897009967
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.8
+Coverage 0.9228855721393034
+Average answer 256.15671641791045
+Average semantic 6.975124378109452
+
+
+Task=nq, alpha=0.1, seed=0, semantic=False
+Best fitness: 11.06312292358804
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.9
+Coverage 0.972636815920398
+Average answer 339.8756218905473
+Average semantic 10.947761194029852
+
+
+Task=nq, alpha=0.1, seed=21, semantic=False
+Best fitness: 7.926910299003322
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.9
+Coverage 0.9527363184079602
+Average answer 278.1194029850746
+Average semantic 7.768656716417911
+
+
+Task=nq, alpha=0.1, seed=42, semantic=False
+Best fitness: 9.046511627906977
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.9
+Coverage 0.9626865671641791
+Average answer 322.44776119402985
+Average semantic 10.014925373134329
+
+
+Task=trivia, alpha=0.1, seed=0, semantic=False
+Best fitness: 4.166666666666667
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.9
+Coverage 0.94
+Average answer 277.6425
+Average semantic 3.7875
+
+
+Task=trivia, alpha=0.1, seed=21, semantic=False
+Best fitness: 3.933333333333333
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.9
+Coverage 0.9575
+Average answer 269.85
+Average semantic 3.7525
+
+
+Task=trivia, alpha=0.1, seed=42, semantic=False
+Best fitness: 4.31
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.9
+Coverage 0.9675
+Average answer 304.2425
+Average semantic 4.52
+
+
+Task=squad1, alpha=0.1, seed=0, semantic=False
+Best fitness: 15.142857142857142
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.9
+Coverage 0.9626865671641791
+Average answer 392.99751243781094
+Average semantic 15.037313432835822
+
+
+Task=squad1, alpha=0.1, seed=21, semantic=False
+Best fitness: 12.933554817275747
+Best parameters: [0.5 0.5]
+Desired coverage rate 0.9
+Coverage 0.9676616915422885
+Average answer 378.39800995024876
+Average semantic 13.447761194029852
+
+
+Task=squad1, alpha=0.1, seed=42, semantic=False

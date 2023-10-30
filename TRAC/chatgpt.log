@@ -1,0 +1,754 @@
+****************************
+Task=nq, alpha=0.2, seed=0, semantic=False
+****************************
+Individual components
+retrieval coverage 0.8737541528239202
+qa coverage 0.9102990033222591
+test retrieval coverage 0.9079601990049752
+test qa coverage 0.9427860696517413
+End-to-end coverage 0.8656716417910447
+Individual compponents with PAC
+retrieval coverage 0.9136212624584718
+qa coverage 0.9601328903654485
+test retrieval coverage 0.9353233830845771
+test qa coverage 0.9552238805970149
+End-to-end coverage 0.8980099502487562
+Vanila Fisher
+Desired coverage rate 0.8
+Coverage 0.9079601990049752
+Average answer 209.40049751243782
+Average semantic 4.987562189054726
+Best fitness: 5.116279069767442
+Best parameters: [0.32525256 0.67474744]
+TRAC
+Desired coverage rate 0.8
+Coverage 0.9701492537313433
+Average answer 212.43781094527364
+Average semantic 5.154228855721393
+Bonf
+Desired coverage rate 0.8
+Coverage 0.9626865671641791
+Average answer 242.6044776119403
+Average semantic 6.08955223880597
+PAC-Bonf
+Desired coverage rate 0.8
+Coverage 0.9751243781094527
+Average answer 329.07462686567163
+Average semantic 9.13681592039801
+
+
+****************************
+Task=nq, alpha=0.2, seed=21, semantic=False
+****************************
+Individual components
+retrieval coverage 0.8305647840531561
+qa coverage 0.8803986710963455
+test retrieval coverage 0.8631840796019901
+test qa coverage 0.8955223880597015
+End-to-end coverage 0.7711442786069652
+Individual compponents with PAC
+retrieval coverage 0.8737541528239202
+qa coverage 0.9003322259136213
+test retrieval coverage 0.9129353233830846
+test qa coverage 0.9129353233830846
+End-to-end coverage 0.8333333333333334
+Vanila Fisher
+Desired coverage rate 0.8
+Coverage 0.8880597014925373
+Average answer 166.39800995024876
+Average semantic 3.5920398009950247
+Best fitness: 3.6710963455149503
+Best parameters: [0.28588563 0.71411437]
+TRAC
+Desired coverage rate 0.8
+Coverage 0.9427860696517413
+Average answer 171.87313432835822
+Average semantic 3.7587064676616917
+Bonf
+Desired coverage rate 0.8
+Coverage 0.9328358208955224
+Average answer 192.72139303482587
+Average semantic 4.435323383084577
+PAC-Bonf
+Desired coverage rate 0.8
+Coverage 0.9676616915422885
+Average answer 242.75124378109453
+Average semantic 5.835820895522388
+
+
+****************************
+Task=nq, alpha=0.2, seed=42, semantic=False
+****************************
+Individual components
+retrieval coverage 0.8538205980066446
+qa coverage 0.9036544850498339
+test retrieval coverage 0.9228855721393034
+test qa coverage 0.9129353233830846
+End-to-end coverage 0.8407960199004975
+Individual compponents with PAC
+retrieval coverage 0.8803986710963455
+qa coverage 0.9401993355481728
+test retrieval coverage 0.9427860696517413
+test qa coverage 0.9378109452736318
+End-to-end coverage 0.8855721393034826
+Vanila Fisher
+Desired coverage rate 0.8
+Coverage 0.9228855721393034
+Average answer 201.0870646766169
+Average semantic 4.6840796019900495
+Best fitness: 3.3853820598006643
+Best parameters: [0.26894142 0.73105858]
+TRAC
+Desired coverage rate 0.8
+Coverage 0.9328358208955224
+Average answer 158.85323383084577
+Average semantic 3.5597014925373136
+Bonf
+Desired coverage rate 0.8
+Coverage 0.9552238805970149
+Average answer 218.29601990049753
+Average semantic 5.174129353233831
+PAC-Bonf
+Desired coverage rate 0.8
+Coverage 0.9676616915422885
+Average answer 301.64925373134326
+Average semantic 7.788557213930348
+
+
+****************************
+Task=trivia, alpha=0.2, seed=0, semantic=False
+****************************
+Individual components
+retrieval coverage 0.8833333333333333
+qa coverage 0.9333333333333333
+test retrieval coverage 0.8925
+test qa coverage 0.915
+End-to-end coverage 0.83
+Individual compponents with PAC
+retrieval coverage 0.8966666666666666
+qa coverage 0.9333333333333333
+test retrieval coverage 0.9125
+test qa coverage 0.9325
+End-to-end coverage 0.8575
+Vanila Fisher
+Desired coverage rate 0.8
+Coverage 0.87
+Average answer 186.225
+Average semantic 2.3175
+Best fitness: 2.6733333333333333
+Best parameters: [0.35688416 0.64311584]
+TRAC
+Desired coverage rate 0.8
+Coverage 0.915
+Average answer 190.5925
+Average semantic 2.405
+Bonf
+Desired coverage rate 0.8
+Coverage 0.95
+Average answer 233.285
+Average semantic 3.1575
+PAC-Bonf
+Desired coverage rate 0.8
+Coverage 0.9575
+Average answer 258.1775
+Average semantic 3.5075
+
+
+****************************
+Task=trivia, alpha=0.2, seed=21, semantic=False
+****************************
+Individual components
+retrieval coverage 0.8966666666666666
+qa coverage 0.9066666666666666
+test retrieval coverage 0.8875
+test qa coverage 0.8725
+End-to-end coverage 0.7825
+Individual compponents with PAC
+retrieval coverage 0.9333333333333333
+qa coverage 0.94
+test retrieval coverage 0.9275
+test qa coverage 0.9175
+End-to-end coverage 0.855
+Vanila Fisher
+Desired coverage rate 0.8
+Coverage 0.8625
+Average answer 181.3225
+Average semantic 2.265
+Best fitness: 2.54
+Best parameters: [0.30608579 0.69391421]
+TRAC
+Desired coverage rate 0.8
+Coverage 0.9325
+Average answer 180.3275
+Average semantic 2.3
+Bonf
+Desired coverage rate 0.8
+Coverage 0.9325
+Average answer 201.225
+Average semantic 2.635
+PAC-Bonf
+Desired coverage rate 0.8
+Coverage 0.965
+Average answer 267.9025
+Average semantic 3.7
+
+
+****************************
+Task=trivia, alpha=0.2, seed=42, semantic=False
+****************************
+Individual components
+retrieval coverage 0.89
+qa coverage 0.9333333333333333
+test retrieval coverage 0.885
+test qa coverage 0.95
+End-to-end coverage 0.8425
+Individual compponents with PAC
+retrieval coverage 0.9266666666666666
+qa coverage 0.9566666666666667
+test retrieval coverage 0.94
+test qa coverage 0.9625
+End-to-end coverage 0.9025
+Vanila Fisher
+Desired coverage rate 0.8
+Coverage 0.8875
+Average answer 206.3325
+Average semantic 2.65
+Best fitness: 2.8433333333333333
+Best parameters: [0.27674038 0.72325962]
+TRAC
+Desired coverage rate 0.8
+Coverage 0.9525
+Average answer 221.66
+Average semantic 2.9625
+Bonf
+Desired coverage rate 0.8
+Coverage 0.945
+Average answer 246.1325
+Average semantic 3.5125
+PAC-Bonf
+Desired coverage rate 0.8
+Coverage 0.97
+Average answer 315.72
+Average semantic 4.92
+
+
+****************************
+Task=squad1, alpha=0.2, seed=0, semantic=False
+****************************
+Individual components
+retrieval coverage 0.8903654485049833
+qa coverage 0.8970099667774086
+test retrieval coverage 0.8706467661691543
+test qa coverage 0.8980099502487562
+End-to-end coverage 0.7885572139303483
+Individual compponents with PAC
+retrieval coverage 0.9036544850498339
+qa coverage 0.9568106312292359
+test retrieval coverage 0.9029850746268657
+test qa coverage 0.9427860696517413
+End-to-end coverage 0.8606965174129353
+Vanila Fisher
+Desired coverage rate 0.8
+Coverage 0.9104477611940298
+Average answer 237.36069651741295
+Average semantic 5.982587064676617
+Best fitness: 4.578073089700997
+Best parameters: [0.32525256 0.67474744]
+TRAC
+Desired coverage rate 0.8
+Coverage 0.9502487562189055
+Average answer 191.30099502487562
+Average semantic 4.338308457711443
+Bonf
+Desired coverage rate 0.8
+Coverage 0.9477611940298507
+Average answer 244.2860696517413
+Average semantic 5.813432835820896
+PAC-Bonf
+Desired coverage rate 0.8
+Coverage 0.9651741293532339
+Average answer 332.6865671641791
+Average semantic 8.813432835820896
+
+
+****************************
+Task=squad1, alpha=0.2, seed=21, semantic=False
+****************************
+Individual components
+retrieval coverage 0.9036544850498339
+qa coverage 0.9003322259136213
+test retrieval coverage 0.9054726368159204
+test qa coverage 0.8756218905472637
+End-to-end coverage 0.7935323383084577
+Individual compponents with PAC
+retrieval coverage 0.9269102990033222
+qa coverage 0.9269102990033222
+test retrieval coverage 0.9378109452736318
+test qa coverage 0.9104477611940298
+End-to-end coverage 0.8532338308457711
+Vanila Fisher
+Desired coverage rate 0.8
+Coverage 0.9253731343283582
+Average answer 223.8507462686567
+Average semantic 5.206467661691542
+Best fitness: 3.3754152823920265
+Best parameters: [0.28588563 0.71411437]
+TRAC
+Desired coverage rate 0.8
+Coverage 0.9527363184079602
+Average answer 167.1144278606965
+Average semantic 3.6666666666666665
+Bonf
+Desired coverage rate 0.8
+Coverage 0.9601990049751243
+Average answer 244.91542288557213
+Average semantic 5.823383084577115
+PAC-Bonf
+Desired coverage rate 0.8
+Coverage 0.9800995024875622
+Average answer 318.83830845771143
+Average semantic 8.121890547263682
+
+
+****************************
+Task=squad1, alpha=0.2, seed=42, semantic=False
+****************************
+Individual components
+retrieval coverage 0.9102990033222591
+qa coverage 0.9667774086378738
+test retrieval coverage 0.8731343283582089
+test qa coverage 0.9378109452736318
+End-to-end coverage 0.8208955223880597
+Individual compponents with PAC
+retrieval coverage 0.9401993355481728
+qa coverage 0.9667774086378738
+test retrieval coverage 0.9029850746268657
+test qa coverage 0.9378109452736318
+End-to-end coverage 0.8507462686567164
+Vanila Fisher
+Desired coverage rate 0.8
+Coverage 0.9228855721393034
+Average answer 256.15671641791045
+Average semantic 6.975124378109452
+Best fitness: 4.9933554817275745
+Best parameters: [0.29953318 0.70046682]
+TRAC
+Desired coverage rate 0.8
+Coverage 0.9427860696517413
+Average answer 206.6318407960199
+Average semantic 4.91542288557214
+Bonf
+Desired coverage rate 0.8
+Coverage 0.9477611940298507
+Average answer 319.90547263681594
+Average semantic 8.649253731343284
+PAC-Bonf
+Desired coverage rate 0.8
+Coverage 0.9601990049751243
+Average answer 336.12935323383084
+Average semantic 9.062189054726367
+
+
+****************************
+Task=nq, alpha=0.1, seed=0, semantic=False
+****************************
+Individual components
+retrieval coverage 0.9302325581395349
+qa coverage 0.973421926910299
+test retrieval coverage 0.9601990049751243
+test qa coverage 0.9776119402985075
+End-to-end coverage 0.9378109452736318
+Individual compponents with PAC
+retrieval coverage 0.9501661129568106
+qa coverage 1.0
+test retrieval coverage 0.9800995024875622
+test qa coverage 1.0
+End-to-end coverage 0.9800995024875622
+Vanila Fisher
+Desired coverage rate 0.9
+Coverage 0.972636815920398
+Average answer 339.8756218905473
+Average semantic 10.947761194029852
+Best fitness: 9.86046511627907
+Best parameters: [0.39095636 0.60904364]
+TRAC
+Desired coverage rate 0.9
+Coverage 0.9875621890547264
+Average answer 362.43532338308455
+Average semantic 10.07960199004975
+Bonf
+Desired coverage rate 0.9
+Coverage 0.9875621890547264
+Average answer 401.06467661691545
+Average semantic 12.2363184079602
+PAC-Bonf
+Desired coverage rate 0.9
+Coverage 0.9925373134328358
+Average answer 552.1641791044776
+Average semantic 23.97761194029851
+
+
+****************************
+Task=nq, alpha=0.1, seed=21, semantic=False
+****************************
+Individual components
+retrieval coverage 0.9102990033222591
+qa coverage 0.9435215946843853
+test retrieval coverage 0.945273631840796
+test qa coverage 0.9577114427860697
+End-to-end coverage 0.9029850746268657
+Individual compponents with PAC
+retrieval coverage 0.9767441860465116
+qa coverage 1.0
+test retrieval coverage 0.9875621890547264
+test qa coverage 1.0
+End-to-end coverage 0.9875621890547264
+Vanila Fisher
+Desired coverage rate 0.9
+Coverage 0.9527363184079602
+Average answer 278.1194029850746
+Average semantic 7.768656716417911
+Best fitness: 6.262458471760797
+Best parameters: [0.30609336 0.69390664]
+TRAC
+Desired coverage rate 0.9
+Coverage 0.9850746268656716
+Average answer 270.42039800995025
+Average semantic 6.562189054726368
+Bonf
+Desired coverage rate 0.9
+Coverage 0.9800995024875622
+Average answer 350.6169154228856
+Average semantic 9.626865671641792
+PAC-Bonf
+Desired coverage rate 0.9
+Coverage 0.9925373134328358
+Average answer 563.5074626865671
+Average semantic 24.27860696517413
+
+
+****************************
+Task=nq, alpha=0.1, seed=42, semantic=False
+****************************
+Individual components
+retrieval coverage 0.9368770764119602
+qa coverage 0.9667774086378738
+test retrieval coverage 0.9651741293532339
+test qa coverage 0.9751243781094527
+End-to-end coverage 0.9402985074626866
+Individual compponents with PAC
+retrieval coverage 0.9601328903654485
+qa coverage 1.0
+test retrieval coverage 0.9850746268656716
+test qa coverage 1.0
+End-to-end coverage 0.9850746268656716
+Vanila Fisher
+Desired coverage rate 0.9
+Coverage 0.9626865671641791
+Average answer 322.44776119402985
+Average semantic 10.014925373134329
+Best fitness: 8.59468438538206
+Best parameters: [0.33948565 0.66051435]
+TRAC
+Desired coverage rate 0.9
+Coverage 0.9925373134328358
+Average answer 335.11442786069654
+Average semantic 8.810945273631841
+Bonf
+Desired coverage rate 0.9
+Coverage 0.9875621890547264
+Average answer 405.12935323383084
+Average semantic 12.233830845771145
+PAC-Bonf
+Desired coverage rate 0.9
+Coverage 0.9950248756218906
+Average answer 553.6567164179105
+Average semantic 23.927860696517413
+
+
+****************************
+Task=trivia, alpha=0.1, seed=0, semantic=False
+****************************
+Individual components
+retrieval coverage 0.91
+qa coverage 0.95
+test retrieval coverage 0.9275
+test qa coverage 0.965
+End-to-end coverage 0.8975
+Individual compponents with PAC
+retrieval coverage 0.95
+qa coverage 0.97
+test retrieval coverage 0.96
+test qa coverage 0.9775
+End-to-end coverage 0.9425
+Vanila Fisher
+Desired coverage rate 0.9
+Coverage 0.94
+Average answer 277.6425
+Average semantic 3.7875
+Best fitness: 4.0633333333333335
+Best parameters: [0.32525256 0.67474744]
+TRAC
+Desired coverage rate 0.9
+Coverage 0.965
+Average answer 280.3075
+Average semantic 3.8175
+Bonf
+Desired coverage rate 0.9
+Coverage 0.9675
+Average answer 312.7575
+Average semantic 4.55
+PAC-Bonf
+Desired coverage rate 0.9
+Coverage 0.9775
+Average answer 394.88
+Average semantic 6.305
+
+
+****************************
+Task=trivia, alpha=0.1, seed=21, semantic=False
+****************************
+Individual components
+retrieval coverage 0.95
+qa coverage 0.95
+test retrieval coverage 0.9425
+test qa coverage 0.9225
+End-to-end coverage 0.8725
+Individual compponents with PAC
+retrieval coverage 0.9666666666666667
+qa coverage 0.98
+test retrieval coverage 0.98
+test qa coverage 0.97
+End-to-end coverage 0.9525
+Vanila Fisher
+Desired coverage rate 0.9
+Coverage 0.9575
+Average answer 269.85
+Average semantic 3.7525
+Best fitness: 4.29
+Best parameters: [0.42552877 0.57447123]
+TRAC
+Desired coverage rate 0.9
+Coverage 0.9675
+Average answer 279.0275
+Average semantic 3.8825
+Bonf
+Desired coverage rate 0.9
+Coverage 0.9675
+Average answer 292.62
+Average semantic 4.18
+PAC-Bonf
+Desired coverage rate 0.9
+Coverage 0.995
+Average answer 411.3175
+Average semantic 6.8475
+
+
+****************************
+Task=trivia, alpha=0.1, seed=42, semantic=False
+****************************
+Individual components
+retrieval coverage 0.9566666666666667
+qa coverage 0.9566666666666667
+test retrieval coverage 0.9675
+test qa coverage 0.9625
+End-to-end coverage 0.93
+Individual compponents with PAC
+retrieval coverage 0.9666666666666667
+qa coverage 0.9933333333333333
+test retrieval coverage 0.9825
+test qa coverage 0.985
+End-to-end coverage 0.9675
+Vanila Fisher
+Desired coverage rate 0.9
+Coverage 0.9675
+Average answer 304.2425
+Average semantic 4.52
+Best fitness: 4.8133333333333335
+Best parameters: [0.52396523 0.47603477]
+TRAC
+Desired coverage rate 0.9
+Coverage 0.975
+Average answer 327.1375
+Average semantic 5.18
+Bonf
+Desired coverage rate 0.9
+Coverage 0.9875
+Average answer 347.5275
+Average semantic 5.5925
+PAC-Bonf
+Desired coverage rate 0.9
+Coverage 0.9925
+Average answer 437.7475
+Average semantic 8.335
+
+
+****************************
+Task=squad1, alpha=0.1, seed=0, semantic=False
+****************************
+Individual components
+retrieval coverage 0.9368770764119602
+qa coverage 0.9767441860465116
+test retrieval coverage 0.927860696517413
+test qa coverage 0.9701492537313433
+End-to-end coverage 0.9029850746268657
+Individual compponents with PAC
+retrieval coverage 0.9767441860465116
+qa coverage 1.0
+test retrieval coverage 0.9701492537313433
+test qa coverage 1.0
+End-to-end coverage 0.9701492537313433
+Vanila Fisher
+Desired coverage rate 0.9
+Coverage 0.9626865671641791
+Average answer 392.99751243781094
+Average semantic 15.037313432835822
+Best fitness: 9.724252491694353
+Best parameters: [0.39095636 0.60904364]
+TRAC
+Desired coverage rate 0.9
+Coverage 0.9875621890547264
+Average answer 354.00995024875624
+Average semantic 9.430348258706468
+Bonf
+Desired coverage rate 0.9
+Coverage 0.9776119402985075
+Average answer 396.72636815920396
+Average semantic 11.895522388059701
+PAC-Bonf
+Desired coverage rate 0.9
+Coverage 0.9950248756218906
+Average answer 568.4328358208955
+Average semantic 25.85323383084577
+
+
+****************************
+Task=squad1, alpha=0.1, seed=21, semantic=False
+****************************
+Individual components
+retrieval coverage 0.9435215946843853
+qa coverage 0.946843853820598
+test retrieval coverage 0.9527363184079602
+test qa coverage 0.9378109452736318
+End-to-end coverage 0.8930348258706468
+Individual compponents with PAC
+retrieval coverage 0.9767441860465116
+qa coverage 1.0
+test retrieval coverage 0.9800995024875622
+test qa coverage 1.0
+End-to-end coverage 0.9800995024875622
+Vanila Fisher
+Desired coverage rate 0.9
+Coverage 0.9676616915422885
+Average answer 378.39800995024876
+Average semantic 13.447761194029852
+Best fitness: 7.644518272425249
+Best parameters: [0.28588563 0.71411437]
+TRAC
+Desired coverage rate 0.9
+Coverage 0.9950248756218906
+Average answer 309.49751243781094
+Average semantic 7.7388059701492535
+Bonf
+Desired coverage rate 0.9
+Coverage 0.9875621890547264
+Average answer 356.52487562189054
+Average semantic 9.67910447761194
+PAC-Bonf
+Desired coverage rate 0.9
+Coverage 0.9975124378109452
+Average answer 572.8358208955224
+Average semantic 26.084577114427862
+
+
+****************************
+Task=squad1, alpha=0.1, seed=42, semantic=False
+****************************
+Individual components
+retrieval coverage 0.9568106312292359
+qa coverage 0.9767441860465116
+test retrieval coverage 0.917910447761194
+test qa coverage 0.9601990049751243
+End-to-end coverage 0.8805970149253731
+Individual compponents with PAC
+retrieval coverage 0.9867109634551495
+qa coverage 1.0
+test retrieval coverage 0.9552238805970149
+test qa coverage 1.0
+End-to-end coverage 0.9552238805970149
+Vanila Fisher
+Desired coverage rate 0.9
+Coverage 0.9552238805970149
+Average answer 378.6542288557214
+Average semantic 13.512437810945274
+Best fitness: 10.049833887043189
+Best parameters: [0.33948565 0.66051435]
+TRAC
+Desired coverage rate 0.9
+Coverage 0.9850746268656716
+Average answer 353.2985074626866
+Average semantic 9.599502487562189
+Bonf
+Desired coverage rate 0.9
+Coverage 0.9676616915422885
+Average answer 393.7786069651741
+Average semantic 11.92039800995025
+PAC-Bonf
+Desired coverage rate 0.9
+Coverage 0.9925373134328358
+Average answer 558.5074626865671
+Average semantic 25.450248756218905
+
+
+****************************
+Task=nq, alpha=0.2, seed=0, semantic=False
+****************************
+****************************
+Task=nq, alpha=0.2, seed=21, semantic=False
+****************************
+****************************
+Task=nq, alpha=0.2, seed=0, semantic=False
+****************************
+Individual components
+retrieval coverage 0.8903654485049833
+qa coverage 0.9036544850498339
+test retrieval coverage 0.8955223880597015
+test qa coverage 0.8955223880597015
+End-to-end coverage 0.8059701492537313
+Individual compponents with PAC
+retrieval coverage 0.9169435215946844
+qa coverage 0.9401993355481728
+test retrieval coverage 0.9154228855721394
+test qa coverage 0.9228855721393034
+End-to-end coverage 0.8507462686567164
+Best fitness: 3.6843853820598005
+Best parameters: [0.32525256 0.67474744]
+TRAC
+Desired coverage rate 0.8
+Coverage 0.7711442786069652
+Average semantic 4.208955223880597
+Bonf
+Desired coverage rate 0.8
+Coverage 0.8258706467661692
+Average semantic 5.293532338308458
+PAC-Bonf
+Desired coverage rate 0.8
+Coverage 0.8905472636815921
+Average semantic 8.199004975124378
+
+
+****************************
+Task=nq, alpha=0.2, seed=21, semantic=False
+****************************
+Individual components
+retrieval coverage 0.9269102990033222
+qa coverage 0.8704318936877077
+test retrieval coverage 0.9029850746268657
+test qa coverage 0.8781094527363185
+End-to-end coverage 0.7885572139303483
+Individual compponents with PAC
+retrieval coverage 0.9634551495016611
+qa coverage 0.9435215946843853
+test retrieval coverage 0.9502487562189055
+test qa coverage 0.9054726368159204
+End-to-end coverage 0.8606965174129353
