@@ -1,6 +1,6 @@
 import os
 os.environ["CUDA_VISIBLE_DEVICES"]="4,5,6,7"
-# from kilt import kilt_utils as utils
+from kilt import kilt_utils as utils
 # from kilt.retrievers import DPR_connector
 import utils
 from rouge_score import rouge_scorer

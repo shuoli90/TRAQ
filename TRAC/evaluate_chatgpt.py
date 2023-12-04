@@ -1,6 +1,6 @@
 import os
 os.environ["CUDA_VISIBLE_DEVICES"]="4,5,6,7"
-from kilt import kilt_utils as utils
+# from kilt import kilt_utils as utils
 # from kilt.retrievers import DPR_connector
 import utils
 from rouge_score import rouge_scorer
@@ -32,33 +32,35 @@ def read_list(file_name):
         n_list = pickle.load(fp)
         return n_list
 
-def read_chatgpt_results(task):
-    retrieved_scores = read_list(f'chatgpt_retrieved_scores_{task}.p')
-    retrieved_true_scores = read_list(f'chatgpt_retrieved_true_scores_{task}.p')
-    queries = read_list(f'chatgpt_queries_{task}.p')
-    answers = read_list(f'chatgpt_answers_{task}.p')
-    chatgpt_true_scores = read_list(f'chatgpt_true_scores_{task}.p')
-    chatgpt_answers = read_list(f'chatgpt_answers_{task}.p')
-    chatgpt_passages = read_list(f'chatgpt_passages_{task}.p')
-    chatgpt_semantics = read_list(f'chatgpt_semantics_{task}.p')
-    chatgpt_occurances = read_list(f'chatgpt_occurances_{task}.p')
-    chatgpt_semantic_ids = read_list(f'chatgpt_semantic_ids_{task}.p')
-    chatgpt_probs = read_list(f'chatgpt_probs_{task}.p')
-    feasibilities = read_list(f'chatgpt_feasibilities_{task}.p')
-
-    retrieved_scores_unc = read_list(f'chatgpt_retrieved_scores_unc_{task}.p')
-    retrieved_true_scores_unc = read_list(f'chatgpt_retrieved_true_scores_unc_{task}.p')
-    queries_unc = read_list(f'chatgpt_queries_unc_{task}.p')
-    answers_unc = read_list(f'chatgpt_answers_unc_{task}.p')
-    passages_unc = read_list(f'chatgpt_passages_unc_{task}.p')
-    chatgpt_true_scores_unc = read_list(f'chatgpt_true_scores_unc_{task}.p')
-    chatgpt_answers_unc = read_list(f'chatgpt_answers_unc_{task}.p')
-    chatgpt_occurances_unc = read_list(f'chatgpt_occurances_unc_{task}.p')
-    chatgpt_semantic_ids_unc = read_list(f'chatgpt_semantic_ids_unc_{task}.p')
-    chatgpt_probs_unc = read_list(f'chatgpt_probs_unc_{task}.p')
-
-    return feasibilities, retrieved_scores, retrieved_true_scores, queries, answers, chatgpt_true_scores, chatgpt_answers, chatgpt_passages, chatgpt_semantics, chatgpt_occurances, chatgpt_semantic_ids, chatgpt_probs, retrieved_scores_unc, retrieved_true_scores_unc, queries_unc, answers_unc, passages_unc, chatgpt_true_scores_unc, chatgpt_answers_unc, chatgpt_occurances_unc, chatgpt_semantic_ids_unc, chatgpt_probs_unc
-
+def read_chatgpt_results(task, dir='collected_tmp'):
+    retrieved_scores = read_list(os.path.join(dir, f'chatgpt_retrieved_scores_{task}.p'))
+    retrieved_true_scores = read_list(os.path.join(dir, f'chatgpt_retrieved_true_scores_{task}.p'))
+    queries = read_list(os.path.join(dir, f'chatgpt_queries_{task}.p'))
+    answers = read_list(os.path.join(dir, f'chatgpt_answers_{task}.p'))
+    chatgpt_true_scores = read_list(os.path.join(dir, f'chatgpt_true_scores_{task}.p'))
+    chatgpt_answers = read_list(os.path.join(dir, f'chatgpt_answers_{task}.p'))
+    chatgpt_passages = read_list(os.path.join(dir, f'chatgpt_passages_{task}.p'))
+    chatgpt_semantics = read_list(os.path.join(dir, f'chatgpt_semantics_{task}.p'))
+    chatgpt_occurances = read_list(os.path.join(dir, f'chatgpt_occurances_{task}.p'))
+    chatgpt_semantic_ids = read_list(os.path.join(dir, f'chatgpt_semantic_ids_{task}.p'))
+    chatgpt_probs = read_list(os.path.join(dir, f'chatgpt_probs_{task}.p'))
+    retrieved_scores_unc = read_list(os.path.join(dir, f'chatgpt_retrieved_scores_unc_{task}.p'))
+    retrieved_true_scores_unc = read_list(os.path.join(dir, f'chatgpt_retrieved_true_scores_unc_{task}.p'))
+    queries_unc = read_list(os.path.join(dir, f'chatgpt_queries_unc_{task}.p'))
+    answers_unc = read_list(os.path.join(dir, f'chatgpt_answers_unc_{task}.p'))
+    passages_unc = read_list(os.path.join(dir, f'chatgpt_passages_unc_{task}.p'))
+    chatgpt_true_scores_unc = read_list(os.path.join(dir, f'chatgpt_true_scores_unc_{task}.p'))
+    chatgpt_answers_unc = read_list(os.path.join(dir, f'chatgpt_answers_unc_{task}.p'))
+    chatgpt_occurances_unc = read_list(os.path.join(dir, f'chatgpt_occurances_unc_{task}.p'))
+    chatgpt_semantic_ids_unc = read_list(os.path.join(dir, f'chatgpt_semantic_ids_unc_{task}.p'))
+    chatgpt_probs_unc = read_list(os.path.join(dir, f'chatgpt_probs_unc_{task}.p'))
+    return retrieved_scores, retrieved_true_scores, queries, answers, \
+        chatgpt_true_scores, chatgpt_answers, chatgpt_passages, \
+        chatgpt_semantics, chatgpt_occurances, chatgpt_semantic_ids, \
+        chatgpt_probs, retrieved_scores_unc, retrieved_true_scores_unc, \
+        queries_unc, answers_unc, passages_unc, chatgpt_true_scores_unc, \
+        chatgpt_answers_unc, chatgpt_occurances_unc, \
+        chatgpt_semantic_ids_unc, chatgpt_probs_unc
 
 def coverage(
         retrieved_true_scores_list, opensource_true_scores_list,
@@ -322,10 +324,10 @@ if __name__ == '__main__':
             ).cuda()
 
     if args.fewshot:
-        feasibilities, retrieved_scores, retrieved_true_scores, queries, answers, chatgpt_true_scores, chatgpt_answers, chatgpt_passages, chatgpt_semantics, chatgpt_occurances, chatgpt_semantic_ids, chatgpt_probs, retrieved_scores_unc, retrieved_true_scores_unc, queries_unc, answers_unc, passages_unc, chatgpt_true_scores_unc, chatgpt_answers_unc, chatgpt_occurances_unc, chatgpt_semantic_ids_unc, chatgpt_probs_unc = \
+        retrieved_scores, retrieved_true_scores, queries, answers, chatgpt_true_scores, chatgpt_answers, chatgpt_passages, chatgpt_semantics, chatgpt_occurances, chatgpt_semantic_ids, chatgpt_probs, retrieved_scores_unc, retrieved_true_scores_unc, queries_unc, answers_unc, passages_unc, chatgpt_true_scores_unc, chatgpt_answers_unc, chatgpt_occurances_unc, chatgpt_semantic_ids_unc, chatgpt_probs_unc = \
             read_chatgpt_results("nq_fewshot")
     else:
-        feasibilities, retrieved_scores, retrieved_true_scores, queries, answers, chatgpt_true_scores, chatgpt_answers, chatgpt_passages, chatgpt_semantics, chatgpt_occurances, chatgpt_semantic_ids, chatgpt_probs, retrieved_scores_unc, retrieved_true_scores_unc, queries_unc, answers_unc, passages_unc, chatgpt_true_scores_unc, chatgpt_answers_unc, chatgpt_occurances_unc, chatgpt_semantic_ids_unc, chatgpt_probs_unc = \
+        retrieved_scores, retrieved_true_scores, queries, answers, chatgpt_true_scores, chatgpt_answers, chatgpt_passages, chatgpt_semantics, chatgpt_occurances, chatgpt_semantic_ids, chatgpt_probs, retrieved_scores_unc, retrieved_true_scores_unc, queries_unc, answers_unc, passages_unc, chatgpt_true_scores_unc, chatgpt_answers_unc, chatgpt_occurances_unc, chatgpt_semantic_ids_unc, chatgpt_probs_unc = \
             read_chatgpt_results(task)
 
     if task == 'bio':
@@ -344,51 +346,6 @@ if __name__ == '__main__':
         for query in queries:
             idx = all_queries.index(query)
             answers.append(elements[idx]['answers'])
-
-    # answers_semantic = []
-    # for true_score, scores, returned_answers in zip(retrieved_true_scores, retrieved_scores, chatgpt_answers):
-    #     idx = list(scores).index(true_score)
-    #     tmp = returned_answers[idx]
-    #     answers_semantic.append(tmp)
-    
-    # chatgpt_true_scores_semantic = []
-    # skip = []
-    # for idx, [query_tmp, true_answer, generated_answer] in tqdm(enumerate(zip(queries, answers, answers_semantic)), total=len(queries)):
-
-    #     prompt = utils.get_prompt_template(query_tmp, "", task="Natural Questions")
-    #     semantic_set_ids, semantic_probs, item_occurance = \
-    #         utils.clustering(
-    #             sequences=generated_answer, 
-    #             prompt=prompt,
-    #             semantic_model=None,
-    #             semantic_tokenizer=None,
-    #             scorer=scorer,
-    #             semantic=False
-    #     )
-    #     true_scores, matched_answer, semantics = utils.processing_answers(
-    #         semantic_set_ids, semantic_probs, 
-    #         item_occurance, true_answer, scorer,
-    #         threshold=0.3
-    #     )
-    #     if len(true_scores) == 0:
-    #         print(idx)
-    #         skip.append(idx)
-    #         continue
-    #     chatgpt_true_scores_semantic.append(true_scores)
-    
-    # for count, idx in enumerate(skip):
-    #     retrieved_scores.pop(idx - count)
-    #     retrieved_true_scores.pop(idx - count)
-    #     queries.pop(idx - count)
-    #     answers.pop(idx - count)
-    #     chatgpt_true_scores.pop(idx - count)
-    #     chatgpt_answers.pop(idx - count)
-    #     chatgpt_passages.pop(idx - count)
-    #     chatgpt_occurances.pop(idx - count)
-    #     chatgpt_semantic_ids.pop(idx - count)
-    #     chatgpt_probs.pop(idx - count)
-    
-    # chatgpt_true_scores = chatgpt_true_scores_semantic
 
     indices = np.arange(len(retrieved_true_scores))
     random.shuffle(indices)
@@ -673,7 +630,6 @@ if __name__ == '__main__':
     results_dict["Vanila_average_semantic"] = np.mean(results[2])
     print()
     print()
-    breakpoint()
     
     with open("chatgpt_results_selection.txt", "a") as f:
         json.dump(results_dict, f)

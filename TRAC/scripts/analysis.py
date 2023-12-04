@@ -1,4 +1,3 @@
-import os
 import json
 import pandas as pd
 import numpy as np
@@ -14,7 +13,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # read in json file line by line
-    with open(os.path.join("numericalResults", f'{args.task}_results.txt'), 'r') as f:
+    with open(f'{args.task}_results.txt', 'r') as f:
         lines = f.readlines()
     # convert lines into pandas dataframe as a list of dicts
     lines = [json.loads(line) for line in lines]
@@ -69,7 +68,7 @@ if __name__ == '__main__':
         # plt.xticks(['75', '80', '85', '90', '95'])
         plt.tight_layout()
         plt.grid(True)
-        plt.savefig(f'plots/{args.task}_{ds}_coverage (individual).png')
+        plt.savefig(f'{args.task}_{ds}_coverage (individual).png')
 
         df_mean.index = 100 - (100-df_mean.index) * 2
         # df_mean.index = df_mean.index * 100
@@ -98,7 +97,7 @@ if __name__ == '__main__':
         else:
             plt.ylabel('Average Semantic')
         plt.tight_layout()
-        plt.savefig(f'plots/{args.task}_{ds}_efficiency.png')
+        plt.savefig(f'{args.task}_{ds}_efficiency.png')
         efficiencies.append(df_efficiency[['TRAC_average_semantic']])
 
     plt.figure()
@@ -123,10 +122,12 @@ if __name__ == '__main__':
     plt.ylabel('Semantic Count')
     plt.tight_layout()
     plt.grid(True)
-    plt.savefig(f'plots/{args.task}_prompt.png')
+    plt.savefig(f'{args.task}_prompt.png')
+
+    
 
     # read in json file line by line
-    with open(os.path.join('numericalResults', f'{args.task}_results_vanila.txt'), 'r') as f:
+    with open(f'{args.task}_results_vanila.txt', 'r') as f:
         lines = f.readlines()
     # convert lines into pandas dataframe as a list of dicts
     lines = [json.loads(line) for line in lines]
@@ -163,7 +164,7 @@ if __name__ == '__main__':
         # plt.title(f'Expected vs. Empirical')
         plt.tight_layout()
         plt.grid(True)
-        plt.savefig(f'plots/{args.task}_{ds}_e2e_coverage.png')
+        plt.savefig(f'{args.task}_{ds}_e2e_coverage.png')
         df_e2e.index = df_e2e.index * 100
         df_e2e.index = df_e2e.index.astype(int)
         # df_e2e = df_e2e.reindex(df_e2e.index[::-1])
@@ -189,7 +190,7 @@ if __name__ == '__main__':
         plt.ylabel('Empirical')
         plt.tight_layout()
         plt.grid(True)
-        plt.savefig(f'plots/{args.task}_{ds}_e2e_coverage2.png')
+        plt.savefig(f'{args.task}_{ds}_e2e_coverage2.png')
         print(df_coverage.to_latex(float_format="{:.1f}".format,))
 
     # select only 'nq', 'trivia', 'squad1'
