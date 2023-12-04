@@ -123,6 +123,7 @@ def evaluate(
                                         if scores >= 0.3:
                                             include = True
                                             break
+                                        break
             if cluster:
                 semantic_set_ids, semantic_probs, item_occurance = \
                             utils.clustering(semantics, "", scorer=scorer)
@@ -278,17 +279,6 @@ def objective_pac(w1, w2):
     average_semantic = np.mean(results[2])
     return average_semantic
 
-# result = gp_minimize(func=objective,
-#                      dimensions=dimensions,
-#                      acq_func="EI",      # the acquisition function
-#                      n_calls=15,
-#                      random_state=seed,
-#                      verbose=True,
-#                      x0=[[1, 1]])
-
-# print("Best fitness:", result.fun)
-# print("Best parameters:", softmax(result.x))
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -335,61 +325,70 @@ if __name__ == '__main__':
         feasibilities, retrieved_scores, retrieved_true_scores, queries, answers, chatgpt_true_scores, chatgpt_answers, chatgpt_passages, chatgpt_semantics, chatgpt_occurances, chatgpt_semantic_ids, chatgpt_probs, retrieved_scores_unc, retrieved_true_scores_unc, queries_unc, answers_unc, passages_unc, chatgpt_true_scores_unc, chatgpt_answers_unc, chatgpt_occurances_unc, chatgpt_semantic_ids_unc, chatgpt_probs_unc = \
             read_chatgpt_results("nq_fewshot")
     else:
-
         feasibilities, retrieved_scores, retrieved_true_scores, queries, answers, chatgpt_true_scores, chatgpt_answers, chatgpt_passages, chatgpt_semantics, chatgpt_occurances, chatgpt_semantic_ids, chatgpt_probs, retrieved_scores_unc, retrieved_true_scores_unc, queries_unc, answers_unc, passages_unc, chatgpt_true_scores_unc, chatgpt_answers_unc, chatgpt_occurances_unc, chatgpt_semantic_ids_unc, chatgpt_probs_unc = \
-        read_chatgpt_results(task)
-    dataset_dpr = tasks.RQA_dpr(task)
-    elements = dataset_dpr.elements
-    all_queries = [element['question'] for element in elements]
+            read_chatgpt_results(task)
+
+    if task == 'bio':
+        task='bio'
+        all_queries, contexts, gold_answers = tasks.bio_dpr(task=task).load_dataset()
+    else:
+        dataset_dpr = tasks.RQA_dpr(task)
+        elements = dataset_dpr.elements
+        all_queries = [element['question'] for element in elements]
     answers = []
-    for query in queries:
-        idx = all_queries.index(query)
-        answers.append(elements[idx]['answers'])
+    if task == 'bio':
+        for query in queries:
+            idx = all_queries.index(query)
+            answers.append(gold_answers[idx])
+    else:
+        for query in queries:
+            idx = all_queries.index(query)
+            answers.append(elements[idx]['answers'])
 
-    answers_semantic = []
-    for true_score, scores, returned_answers in zip(retrieved_true_scores, retrieved_scores, chatgpt_answers):
-        idx = list(scores).index(true_score)
-        tmp = returned_answers[idx]
-        answers_semantic.append(tmp)
+    # answers_semantic = []
+    # for true_score, scores, returned_answers in zip(retrieved_true_scores, retrieved_scores, chatgpt_answers):
+    #     idx = list(scores).index(true_score)
+    #     tmp = returned_answers[idx]
+    #     answers_semantic.append(tmp)
     
-    chatgpt_true_scores_semantic = []
-    skip = []
-    for idx, [query_tmp, true_answer, generated_answer] in tqdm(enumerate(zip(queries, answers, answers_semantic)), total=len(queries)):
+    # chatgpt_true_scores_semantic = []
+    # skip = []
+    # for idx, [query_tmp, true_answer, generated_answer] in tqdm(enumerate(zip(queries, answers, answers_semantic)), total=len(queries)):
 
-        prompt = utils.get_prompt_template(query_tmp, "", task="Natural Questions")
-        semantic_set_ids, semantic_probs, item_occurance = \
-            utils.clustering(
-                sequences=generated_answer, 
-                prompt=prompt,
-                semantic_model=None,
-                semantic_tokenizer=None,
-                scorer=scorer,
-                semantic=False
-        )
-        true_scores, matched_answer, semantics = utils.processing_answers(
-            semantic_set_ids, semantic_probs, 
-            item_occurance, true_answer, scorer,
-            threshold=0.3
-        )
-        if len(true_scores) == 0:
-            print(idx)
-            skip.append(idx)
-            continue
-        chatgpt_true_scores_semantic.append(true_scores)
+    #     prompt = utils.get_prompt_template(query_tmp, "", task="Natural Questions")
+    #     semantic_set_ids, semantic_probs, item_occurance = \
+    #         utils.clustering(
+    #             sequences=generated_answer, 
+    #             prompt=prompt,
+    #             semantic_model=None,
+    #             semantic_tokenizer=None,
+    #             scorer=scorer,
+    #             semantic=False
+    #     )
+    #     true_scores, matched_answer, semantics = utils.processing_answers(
+    #         semantic_set_ids, semantic_probs, 
+    #         item_occurance, true_answer, scorer,
+    #         threshold=0.3
+    #     )
+    #     if len(true_scores) == 0:
+    #         print(idx)
+    #         skip.append(idx)
+    #         continue
+    #     chatgpt_true_scores_semantic.append(true_scores)
     
-    for count, idx in enumerate(skip):
-        retrieved_scores.pop(idx - count)
-        retrieved_true_scores.pop(idx - count)
-        queries.pop(idx - count)
-        answers.pop(idx - count)
-        chatgpt_true_scores.pop(idx - count)
-        chatgpt_answers.pop(idx - count)
-        chatgpt_passages.pop(idx - count)
-        chatgpt_occurances.pop(idx - count)
-        chatgpt_semantic_ids.pop(idx - count)
-        chatgpt_probs.pop(idx - count)
+    # for count, idx in enumerate(skip):
+    #     retrieved_scores.pop(idx - count)
+    #     retrieved_true_scores.pop(idx - count)
+    #     queries.pop(idx - count)
+    #     answers.pop(idx - count)
+    #     chatgpt_true_scores.pop(idx - count)
+    #     chatgpt_answers.pop(idx - count)
+    #     chatgpt_passages.pop(idx - count)
+    #     chatgpt_occurances.pop(idx - count)
+    #     chatgpt_semantic_ids.pop(idx - count)
+    #     chatgpt_probs.pop(idx - count)
     
-    chatgpt_true_scores = chatgpt_true_scores_semantic
+    # chatgpt_true_scores = chatgpt_true_scores_semantic
 
     indices = np.arange(len(retrieved_true_scores))
     random.shuffle(indices)
@@ -437,12 +436,24 @@ if __name__ == '__main__':
                                        use_stemmer=True)
 
     print("Individual components")
+    if task == 'bio':
+        # cal_first_retrieved_true_scores = [np.max(scores) for scores in cal_first_retrieved_true_scores]
+        tmp = []
+        for scores in cal_first_retrieved_true_scores:
+            tmp.extend(scores)
+        cal_first_retrieved_true_scores = tmp
     retrieved_thr = utils.compute_threshold(cal_first_retrieved_true_scores, alpha=args.alpha/2)
     cal_first_scores = []
     for scores in cal_first_chatgpt_true_scores:
         cal_first_scores.append(np.max(scores))
     chatgpt_qa_thr = utils.compute_threshold(cal_first_scores, alpha=args.alpha/2)
 
+    if task == 'bio':
+        # cal_second_retrieved_true_scores = [np.max(scores) for scores in cal_second_retrieved_true_scores]
+        tmp = []
+        for scores in cal_second_retrieved_true_scores:
+            tmp.extend(scores)
+        cal_second_retrieved_true_scores = tmp
     retrieved_coverage = np.mean(np.array(cal_second_retrieved_true_scores) >= retrieved_thr)
     cal_second_scores = []
     for scores in cal_second_chatgpt_true_scores:
@@ -451,6 +462,12 @@ if __name__ == '__main__':
     print('retrieval coverage', retrieved_coverage)
     print('qa coverage', qa_coverage)
 
+    if task == 'bio':
+        # test_retrieved_true_scores = [np.max(scores) for scores in test_retrieved_true_scores]
+        tmp = []
+        for scores in test_retrieved_true_scores:
+            tmp.extend(scores)
+        test_retrieved_true_scores = tmp
     retrieved_coverage = np.mean(np.array(test_retrieved_true_scores) >= retrieved_thr)
     test_scores = []
     for scores in test_chatgpt_true_scores:
@@ -527,26 +544,27 @@ if __name__ == '__main__':
     weights = softmax(result.x).reshape(-1, 1)
     alpha_retrieve = alpha * weights[0]
     alpha_qa = alpha * weights[1]
+
     retrieved_thr = utils.compute_threshold(cal_first_retrieved_true_scores, alpha=alpha_retrieve)
     cal_first_scores = []
     for scores in cal_first_chatgpt_true_scores:
         cal_first_scores.append(np.max(scores))
     chatgpt_qa_thr = utils.compute_threshold(cal_first_scores, alpha=alpha_qa)
-    results = evaluate(
+    results_TRAC = evaluate(
         test_retrieved_scores, test_queries,
         test_answers, test_chatgpt_answers, 
-        test_chatgpt_semantic_ids, test_chatgpt_probs, 
+        test_chatgpt_semantic_ids, test_chatgpt_probs,
         retrieved_thr, chatgpt_qa_thr,
         cluster=True)
 
     print('TRAC')
     print('Desired coverage rate', 1-args.alpha)
-    print('Coverage', np.mean(results[0]))
+    print('Coverage', np.mean(results_TRAC[0]))
     # print('Average answer', np.mean(results[1]))
-    print('Average semantic', np.mean(results[2]))
+    print('Average semantic', np.mean(results_TRAC[2]))
 
-    results_dict["TRAC_coverage"] = np.mean(results[0])
-    results_dict["TRAC_average_semantic"] = np.mean(results[2])
+    results_dict["TRAC_coverage"] = np.mean(results_TRAC[0])
+    results_dict["TRAC_average_semantic"] = np.mean(results_TRAC[2])
 
     alpha_retrieve = alpha * (1/2.0)
     alpha_qa = alpha * (1/2.0)
@@ -555,7 +573,7 @@ if __name__ == '__main__':
     for scores in cal_first_chatgpt_true_scores:
         cal_first_scores.append(np.max(scores))
     chatgpt_qa_thr = utils.compute_threshold(cal_first_scores, alpha=alpha_qa)
-    results = evaluate(
+    results_Bonf = evaluate(
         test_retrieved_scores, test_queries,
         test_answers, test_chatgpt_answers, 
         test_chatgpt_semantic_ids, test_chatgpt_probs,
@@ -563,12 +581,11 @@ if __name__ == '__main__':
         cluster=True)
     print('Bonf')
     print('Desired coverage rate', 1-args.alpha)
-    print('Coverage', np.mean(results[0]))
-    # print('Average answer', np.mean(results[1]))
-    print('Average semantic', np.mean(results[2]))
+    print('Coverage', np.mean(results_Bonf[0]))
+    print('Average semantic', np.mean(results_Bonf[2]))
 
-    results_dict["Bonf_coverage"] = np.mean(results[0])
-    results_dict["Bonf_average_semantic"] = np.mean(results[2])
+    results_dict["Bonf_coverage"] = np.mean(results_Bonf[0])
+    results_dict["Bonf_average_semantic"] = np.mean(results_Bonf[2])
 
     alpha_retrieve = alpha * (1/2.0)
     alpha_qa = alpha * (1/2.0)
@@ -640,9 +657,9 @@ if __name__ == '__main__':
     results_dict["PAC_TRAC_average_semantic"] = np.mean(results[2])
 
     results = evaluate_vanila(
-        test_retrieved_scores, test_queries,
-        test_answers, test_chatgpt_answers, 
-        test_chatgpt_semantic_ids, test_chatgpt_probs, 
+        retrieved_scores, queries,
+        answers, chatgpt_answers, 
+        chatgpt_semantic_ids, chatgpt_probs, 
         cluster=True)
 
     print('Vanila')
@@ -656,7 +673,8 @@ if __name__ == '__main__':
     results_dict["Vanila_average_semantic"] = np.mean(results[2])
     print()
     print()
+    breakpoint()
     
-    with open("chatgpt_results.txt", "a") as f:
+    with open("chatgpt_results_selection.txt", "a") as f:
         json.dump(results_dict, f)
         f.write('\n')

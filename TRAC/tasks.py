@@ -5,6 +5,7 @@ import numpy as np
 import json
 from kilt import kilt_utils as utils
 import logging
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -66,3 +67,25 @@ class RQA_dpr:
                 {"query": record["question"], "id": idx}
             )
         return query_data, validated_data, elements
+
+
+
+
+class bio_dpr:
+    def __init__(self, task='nq') -> None:
+        assert task in ['bio']
+        self.task = task
+        # self.questions, self.contexts, self.answers = self.load_dataset()
+    
+    def load_bioasq(self, path):
+        if not path.exists():
+            raise FileNotFoundError(f"{path} does not exist")
+
+        with open(path, "r") as f:
+            data = json.load(f)
+    
+        return data
+
+    def load_dataset(self) -> None:
+        bio_dpr = json.load(open("bio_fact.json", "r"))
+        return bio_dpr['questions'], bio_dpr['contexts'], bio_dpr['answers']

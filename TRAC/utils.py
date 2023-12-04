@@ -705,7 +705,7 @@ def compute_threshold(scores, alpha, portion=0.5, shuffle=True):
     # cal = scores[:int(len(scores)*portion)]
     # test = scores[int(len(scores)*(1-portion)):]
     
-    thr_most_relevant = np.quantile(scores, alpha, interpolation='higher')
+    thr_most_relevant = np.quantile(scores, alpha, interpolation='lower')
     # print(f"Most relevant threshold: {thr_most_relevant}")
     # test = np.array(test)
     # coverage_most_relevant = np.mean(test >= thr_most_relevant)
@@ -768,3 +768,68 @@ def read_list(file_name):
     with open(file_name, 'rb') as fp:
         n_list = pickle.load(fp)
         return n_list
+    
+def compute_semantic_clusterring(model, tokenizer,
+                                 question, answers):
+    # filter out non-unique answers
+    unique_generated_texts, item_occurance = \
+        utils.unique_items(answers)
+
+    # unique_generated_texts = list(set(answers))
+    semantic_set_ids = {}
+    for index, answer in enumerate(unique_generated_texts):
+        semantic_set_ids[answer] = index
+    # print('Number of unique answers:', len(unique_generated_texts))
+
+    with torch.no_grad():
+        semantics = [0]
+        for i in range(1, len(unique_generated_texts)):
+            included = False
+            for semantic in semantics:
+                qa_1 = question + ' ' + unique_generated_texts[semantic]
+                qa_2 = question + ' ' + unique_generated_texts[i]
+
+                input = qa_1 + ' [SEP] ' + qa_2
+                encoded_input = tokenizer.encode(input, padding=True)
+                prediction = model(torch.tensor([encoded_input], device='cuda'))['logits']
+                predicted_label = torch.argmax(prediction, dim=1)
+
+                reverse_input = qa_2 + ' [SEP] ' + qa_1
+                encoded_reverse_input = tokenizer.encode(
+                    reverse_input,
+                    padding=True)
+                reverse_prediction = model(torch.tensor([encoded_reverse_input], device='cuda'))['logits']
+                reverse_predicted_label = torch.argmax(
+                    reverse_prediction,
+                    dim=1)
+
+                if 2 in predicted_label and 2 in reverse_predicted_label:
+                    semantic_set_ids[unique_generated_texts[i]] = \
+                        semantic_set_ids[unique_generated_texts[semantic]]
+                    included = True
+                    break
+            if not included:
+                semantics.append(i)
+
+    semantic_probs = get_semantic_prob(semantic_set_ids, item_occurance)
+    return semantic_set_ids, semantic_probs, item_occurance
+
+def get_prompt_template_fewshot(
+        query, 
+        context, 
+        demonstrations):
+    
+    prompt = ""
+    for demo in demonstrations:
+        prompt += f"""Answer the following question based on the given context; Answer the question shortly.
+                Question: '''{demo[0]}'''
+                Context: '''{demo[1]}'''
+                Answer: '''{demo[2]}'''
+                """
+        
+    prompt += f"""Answer the following question based on the given context; Answer the question shortly.
+            Question: '''{query}'''
+            Context: '''{context}'''
+            Answer:
+            """
+    return prompt

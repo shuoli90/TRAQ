@@ -70,17 +70,17 @@ def save_results(task):
     # save semantic_ids to a pickle file
     write_list(semantic_ids, f'semantic_ids_{task}.p')
 
-def read_results(task):
-    retrieved_scores = read_list(f'retrieved_scores_{task}.p')
-    retrieved_true_scores = read_list(f'retrieved_true_scores_{task}.p')
-    queries = read_list(f'queries_{task}.p')
-    answers = read_list(f'answers_{task}.p')
-    opensource_true_scores = read_list(f'opensource_true_scores_{task}.p')
-    opensource_answers = read_list(f'opensource_answers_{task}.p')
-    opensource_semantics = read_list(f'opensource_semantics_{task}.p')
-    opensource_occurances = read_list(f'occurances_{task}.p')
-    opensource_semantic_ids = read_list(f'semantic_ids_{task}.p')
-    opensource_probs = read_list(f'probs_{task}.p')
+def read_results(task, end=1000):
+    retrieved_scores = read_list(f'retrieved_scores_{task}.p')[:end]
+    retrieved_true_scores = read_list(f'retrieved_true_scores_{task}.p')[:end]
+    queries = read_list(f'queries_{task}.p')[:end]
+    answers = read_list(f'answers_{task}.p')[:end]
+    opensource_true_scores = read_list(f'opensource_true_scores_{task}.p')[:end]
+    opensource_answers = read_list(f'opensource_answers_{task}.p')[:end]
+    opensource_semantics = read_list(f'opensource_semantics_{task}.p')[:end]
+    opensource_occurances = read_list(f'occurances_{task}.p')[:end]
+    opensource_semantic_ids = read_list(f'semantic_ids_{task}.p')[:end]
+    opensource_probs = read_list(f'probs_{task}.p')[:end]
     
     return retrieved_scores, retrieved_true_scores, \
            queries, answers, \
@@ -319,7 +319,7 @@ def objective_pac(w1, w2):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--task', type=str, default='trivia')
+    parser.add_argument('--task', type=str, default='nq')
     parser.add_argument('--alpha', type=float, default=0.2)
     parser.add_argument('--semantic', type=bool, default=False)
     parser.add_argument('--seed', type=int, default=42)
@@ -357,7 +357,7 @@ if __name__ == '__main__':
             ).cuda()
 
     retrieved_scores, retrieved_true_scores, queries, answers, opensource_true_scores, opensource_answers, opensource_occurances, opensource_semantic_ids, opensource_probs = \
-        read_results(task)
+        read_results(task, end=1000)
     # dataset_dpr = tasks.RQA_dpr(task=args.task)
     # elements = dataset_dpr.elements
     # all_queries = [element['question'] for element in elements]
@@ -630,9 +630,9 @@ if __name__ == '__main__':
     results_dict["PAC_TRAC_average_semantic"] = np.mean(results[2])
 
     results = evaluate_vanila(
-        test_retrieved_scores, test_queries,
-        test_answers, test_opensource_answers, 
-        test_opensource_semantic_ids, test_opensource_probs, 
+        retrieved_scores, queries,
+        answers, opensource_answers, 
+        opensource_semantic_ids, opensource_probs, 
         cluster=True)
     
     print('Vanila')
@@ -647,6 +647,6 @@ if __name__ == '__main__':
     print()
     print()
 
-    with open("opensource_results.txt", "a") as f:
+    with open("opensource_results_new.txt", "a") as f:
         json.dump(results_dict, f)
         f.write("\n")
