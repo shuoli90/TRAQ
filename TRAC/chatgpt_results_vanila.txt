@@ -1,5 +1,0 @@
-{"task": "bio", "alpha": 0.1, "seed": 42, "semantic": false, "Vanila_coverage": 0.7111834961997828, "Vanila_average_semantic": 2.8327904451682953}
-{"task": "nq", "alpha": 0.1, "seed": 42, "semantic": false, "Vanila_coverage": 0.6822709163346613, "Vanila_average_semantic": 2.8207171314741037}
-{"task": "trivia", "alpha": 0.1, "seed": 42, "semantic": false, "Vanila_coverage": 0.8608608608608609, "Vanila_average_semantic": 2.5015015015015014}
-{"task": "squad1", "alpha": 0.1, "seed": 42, "semantic": false, "Vanila_coverage": 0.5388446215139442, "Vanila_average_semantic": 3.181274900398406}
-{"task": "squad1", "alpha": 0.1, "seed": 42, "semantic": true, "Vanila_coverage": 0.5378486055776892, "Vanila_average_semantic": 9.4402390438247}
