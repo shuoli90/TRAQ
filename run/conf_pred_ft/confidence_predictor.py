@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import wget
-import os
 import pandas as pd
 import json
  
