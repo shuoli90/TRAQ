@@ -34,7 +34,7 @@ if __name__ == "__main__":
     model_name = "NousResearch/Llama-2-7b-chat-hf"
 
     # Fine-tuned model name
-    new_model = f"../../finetuned_models/llama-2-7b-shuo-{args.task}-new"
+    new_model = f"../../finetuned_models/llama-2-7b-traq-{args.task}-new"
 
     ################################################################################
     # QLoRA parameters
