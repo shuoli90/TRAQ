@@ -37,7 +37,7 @@ def setup_openai():
     dotenv_path = Path('.env')
     load_dotenv(dotenv_path=dotenv_path)
     openai.api_key = os.getenv('OPENAI_API_KEY')
-    openai.organization = 'org-ZZanmSElxExwouVgEWnZL8zv'
+    # openai.organization = 'org-ZZanmSElxExwouVgEWnZL8zv'
 
 
 def add_home_directory_to_path():
