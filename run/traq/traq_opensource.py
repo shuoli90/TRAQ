@@ -1,37 +1,35 @@
 import os
 os.environ["CUDA_VISIBLE_DEVICES"]="4,5,6,7"
-from utils import utils
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from misc import utils
 from rouge_score import rouge_scorer
 import random
 import numpy as np
 import torch
 import argparse
 torch.set_grad_enabled(False)
-from utils.pac_utils import find_maximum_train_error_allow
+from misc.pac_utils import find_maximum_train_error_allow
 import time
-import pickle
 import json
-from utils import tasks
 from skopt.space import Real
 from skopt import gp_minimize
 from skopt.utils import use_named_args
-import multiprocessing
 from multiprocessing import Value
-from tqdm import tqdm
-import trac_chatgpt
+import run.traq.traq_chatgpt as traq_chatgpt
 import matplotlib.pyplot as plt
 
 def read_results(task, end=1000, dir='../collected_data'):
-    retrieved_scores = trac_chatgpt.read_list(os.path.join(dir, f'retrieved_scores_{task}.p'))[:end]
-    retrieved_true_scores = trac_chatgpt.read_list(os.path.join(dir, f'retrieved_true_scores_{task}.p'))[:end]
-    queries = trac_chatgpt.read_list(os.path.join(dir, f'queries_{task}.p'))[:end]
-    answers = trac_chatgpt.read_list(os.path.join(dir, f'answers_{task}.p'))[:end]
-    opensource_true_scores = trac_chatgpt.read_list(os.path.join(dir, f'opensource_true_scores_{task}.p'))[:end]
-    opensource_answers = trac_chatgpt.read_list(os.path.join(dir, f'opensource_answers_{task}.p'))[:end]
-    opensource_semantics = trac_chatgpt.read_list(os.path.join(dir, f'opensource_semantics_{task}.p'))[:end]
-    opensource_occurances = trac_chatgpt.read_list(os.path.join(dir, f'occurances_{task}.p'))[:end]
-    opensource_semantic_ids = trac_chatgpt.read_list(os.path.join(dir, f'semantic_ids_{task}.p'))[:end]
-    opensource_probs = trac_chatgpt.read_list(os.path.join(dir, f'probs_{task}.p'))[:end]
+    retrieved_scores = traq_chatgpt.read_list(os.path.join(dir, f'retrieved_scores_{task}.p'))[:end]
+    retrieved_true_scores = traq_chatgpt.read_list(os.path.join(dir, f'retrieved_true_scores_{task}.p'))[:end]
+    queries = traq_chatgpt.read_list(os.path.join(dir, f'queries_{task}.p'))[:end]
+    answers = traq_chatgpt.read_list(os.path.join(dir, f'answers_{task}.p'))[:end]
+    opensource_true_scores = traq_chatgpt.read_list(os.path.join(dir, f'opensource_true_scores_{task}.p'))[:end]
+    opensource_answers = traq_chatgpt.read_list(os.path.join(dir, f'opensource_answers_{task}.p'))[:end]
+    opensource_semantics = traq_chatgpt.read_list(os.path.join(dir, f'opensource_semantics_{task}.p'))[:end]
+    opensource_occurances = traq_chatgpt.read_list(os.path.join(dir, f'occurances_{task}.p'))[:end]
+    opensource_semantic_ids = traq_chatgpt.read_list(os.path.join(dir, f'semantic_ids_{task}.p'))[:end]
+    opensource_probs = traq_chatgpt.read_list(os.path.join(dir, f'probs_{task}.p'))[:end]
     
     return retrieved_scores, retrieved_true_scores, \
            queries, answers, \
@@ -49,7 +47,7 @@ dimensions = [w1, w2]
 
 @use_named_args(dimensions=dimensions)
 def objective(w1, w2):
-    weights = trac_chatgpt.softmax(np.array([w1, w2])).reshape(-1, 1)
+    weights = traq_chatgpt.softmax(np.array([w1, w2])).reshape(-1, 1)
     alpha_retrieve = alpha * weights[0]
     alpha_qa = alpha * weights[1]
     retrieved_thr = utils.compute_threshold(cal_first_retrieved_true_scores, alpha=alpha_retrieve)
@@ -57,7 +55,7 @@ def objective(w1, w2):
     for scores in cal_first_opensource_true_scores:
         cal_first_scores.append(np.max(scores))
     opensource_qa_thr = utils.compute_threshold(cal_first_scores, alpha=alpha_qa)
-    results = trac_chatgpt.evaluate(cal_second_retrieved_scores, cal_second_queries, \
+    results = traq_chatgpt.evaluate(cal_second_retrieved_scores, cal_second_queries, \
                        cal_second_answers, cal_second_opensource_answers, \
                        cal_second_opensource_semantic_ids, cal_second_opensource_probs, \
                        retrieved_thr, opensource_qa_thr, scorer=scorer,
@@ -70,7 +68,7 @@ def objective(w1, w2):
 
 @use_named_args(dimensions=dimensions)
 def objective_pac(w1, w2):
-    weights = trac_chatgpt.softmax(np.array([w1, w2])).reshape(-1, 1)
+    weights = traq_chatgpt.softmax(np.array([w1, w2])).reshape(-1, 1)
     alpha_retrieve = alpha * weights[0]
     alpha_qa = alpha * weights[1]
     alpha_retrieve_pac = find_maximum_train_error_allow(alpha_retrieve, delta/2.0, len(cal_first_indices))
@@ -81,10 +79,10 @@ def objective_pac(w1, w2):
     for scores in cal_first_opensource_true_scores:
         cal_first_scores.append(np.max(scores))
     opensource_qa_thr = utils.compute_threshold(cal_first_scores, alpha=alpha_qa_pac)
-    results = trac_chatgpt.evaluate(cal_second_retrieved_scores, cal_second_queries, 
+    results = traq_chatgpt.evaluate(cal_second_retrieved_scores, cal_second_queries, 
                        cal_second_answers, cal_second_opensource_answers, \
                        cal_second_opensource_semantic_ids, cal_second_opensource_probs, 
-                       retrieved_thr, opensource_qa_thr, scorer=trac_chatgpt.scorer,
+                       retrieved_thr, opensource_qa_thr, scorer=traq_chatgpt.scorer,
                        cluster=True)
     coverage = np.mean(results[0])
     average_answer = np.mean(results[1])
@@ -132,19 +130,6 @@ if __name__ == '__main__':
 
     retrieved_scores, retrieved_true_scores, queries, answers, opensource_true_scores, opensource_answers, opensource_occurances, opensource_semantic_ids, opensource_probs = \
         read_results(task, end=1000)
-    # dataset_dpr = tasks.RQA_dpr(task=args.task)
-    # elements = dataset_dpr.elements
-    # all_queries = [element['question'] for element in elements]
-    # answers = []
-    # for query in queries:
-    #     idx = all_queries.index(query)
-    #     answers.append(elements[idx]['answers'])
-    # answers_semantic = []
-    # probs_semantic = []
-    # for idx_tmp, [true_score, scores, returned_answers] in enumerate(zip(retrieved_true_scores, retrieved_scores, opensource_answers)):
-    #     idx = list(scores).index(true_score)
-    #     tmp = returned_answers[idx]
-    #     answers_semantic.append(tmp)
     
 
     indices = np.arange(len(retrieved_true_scores))
@@ -226,7 +211,7 @@ if __name__ == '__main__':
     results_dict["retrieval_coverage"] = retrieved_coverage
     results_dict["qa_coverage"] = qa_coverage
 
-    coverages = trac_chatgpt.coverage(
+    coverages = traq_chatgpt.coverage(
         test_retrieved_true_scores,
         test_opensource_true_scores,
         retrieved_thr,
@@ -261,7 +246,7 @@ if __name__ == '__main__':
     print('test retrieval coverage', retrieved_coverage)
     print('test qa coverage', qa_coverage)
 
-    coverages = trac_chatgpt.coverage(
+    coverages = traq_chatgpt.coverage(
         test_retrieved_true_scores, 
         test_opensource_true_scores,
         retrieved_thr,
@@ -294,9 +279,9 @@ if __name__ == '__main__':
         x0=[[1, 1]])
 
     print("Best fitness:", result.fun)
-    print("Best parameters:", trac_chatgpt.softmax(result.x))
+    print("Best parameters:", traq_chatgpt.softmax(result.x))
 
-    weights = trac_chatgpt.softmax(result.x).reshape(-1, 1)
+    weights = traq_chatgpt.softmax(result.x).reshape(-1, 1)
     alpha_retrieve = alpha * weights[0]
     alpha_qa = alpha * weights[1]
     retrieved_thr = utils.compute_threshold(cal_first_retrieved_true_scores, alpha=alpha_retrieve)
@@ -304,7 +289,7 @@ if __name__ == '__main__':
     for scores in cal_first_opensource_true_scores:
         cal_first_scores.append(np.max(scores))
     opensource_qa_thr = utils.compute_threshold(cal_first_scores, alpha=alpha_qa)
-    results = trac_chatgpt.evaluate(
+    results = traq_chatgpt.evaluate(
         test_retrieved_scores, test_queries,
         test_answers, test_opensource_answers, 
         test_opensource_semantic_ids, test_opensource_probs,
@@ -328,7 +313,7 @@ if __name__ == '__main__':
     for scores in cal_first_opensource_true_scores:
         cal_first_scores.append(np.max(scores))
     opensource_qa_thr = utils.compute_threshold(cal_first_scores, alpha=alpha_qa)
-    results = trac_chatgpt.evaluate(
+    results = traq_chatgpt.evaluate(
         test_retrieved_scores, test_queries,
         test_answers, test_opensource_answers, 
         test_opensource_semantic_ids, test_opensource_probs,
@@ -356,7 +341,7 @@ if __name__ == '__main__':
     for scores in cal_first_opensource_true_scores:
         cal_first_scores.append(np.max(scores))
     opensource_qa_thr = utils.compute_threshold(cal_first_scores, alpha=alpha_qa_pac)
-    results = trac_chatgpt.evaluate(
+    results = traq_chatgpt.evaluate(
         test_retrieved_scores, test_queries,
         test_answers, test_opensource_answers, 
         test_opensource_semantic_ids, test_opensource_probs, 
@@ -384,9 +369,9 @@ if __name__ == '__main__':
         x0=[[1, 1]])
 
     print("Best fitness:", result.fun)
-    print("Best parameters:", trac_chatgpt.softmax(result.x))
+    print("Best parameters:", traq_chatgpt.softmax(result.x))
 
-    weights = trac_chatgpt.softmax(result.x).reshape(-1, 1)
+    weights = traq_chatgpt.softmax(result.x).reshape(-1, 1)
     alpha_retrieve = alpha * weights[0]
     alpha_qa = alpha * weights[1]
     alpha_retrieve_pac = find_maximum_train_error_allow(alpha_retrieve, delta/2.0, len(cal_first_indices))
@@ -396,7 +381,7 @@ if __name__ == '__main__':
     for scores in cal_first_opensource_true_scores:
         cal_first_scores.append(np.max(scores))
     opensource_qa_thr = utils.compute_threshold(cal_first_scores, alpha=alpha_qa_pac)
-    results = trac_chatgpt.evaluate(
+    results = traq_chatgpt.evaluate(
         test_retrieved_scores, test_queries,
         test_answers, test_opensource_answers, 
         test_opensource_semantic_ids, test_opensource_probs, 
@@ -412,7 +397,7 @@ if __name__ == '__main__':
     results_dict["PAC_TRAC_coverage"] = np.mean(results[0])
     results_dict["PAC_TRAC_average_semantic"] = np.mean(results[2])
 
-    results = trac_chatgpt.evaluate_vanila(
+    results = traq_chatgpt.evaluate_vanila(
         retrieved_scores, queries,
         answers, opensource_answers, 
         opensource_semantic_ids, opensource_probs, scorer=scorer, sample=False,

@@ -1,51 +1,62 @@
 import os
 os.environ["CUDA_VISIBLE_DEVICES"]="4,5,6,7"
-from utils import utils
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from misc import utils
 from rouge_score import rouge_scorer
 import random
 import numpy as np
 import torch
 import argparse
 torch.set_grad_enabled(False)
-from utils.pac_utils import find_maximum_train_error_allow
+from misc.pac_utils import find_maximum_train_error_allow
 import time
-import pickle
 import json
-from utils import tasks
+from misc import tasks
 from tqdm import tqdm
 from skopt.space import Real
 from skopt import gp_minimize
 from skopt.utils import use_named_args
 import multiprocessing
 from multiprocessing import Value
-import torch.multiprocessing as mp
-import trac_chatgpt
+import run.traq.traq_chatgpt as traq_chatgpt
 
+
+def write_list(a_list, file_name):
+    # store list in binary file so 'wb' mode
+    with open(file_name, 'wb') as fp:
+        pickle.dump(a_list, fp)
+        print('Done writing list into a binary file')
+def read_list(file_name):
+    # for reading also binary mode is important
+    with open(file_name, 'rb') as fp:
+        n_list = pickle.load(fp)
+        return n_list
 
 def read_chatgpt_results(task, dir='../collected_data'):
-    retrieved_scores = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_retrieved_scores_{task}.p'))
-    retrieved_true_scores = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_retrieved_true_scores_{task}.p'))
-    queries = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_queries_{task}.p'))
-    answers = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_answers_{task}.p'))
-    chatgpt_true_scores = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_true_scores_{task}.p'))
-    chatgpt_answers = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_answers_{task}.p'))
-    chatgpt_passages = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_passages_{task}.p'))
-    chatgpt_semantics = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_semantics_{task}.p'))
-    chatgpt_occurances = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_occurances_{task}.p'))
-    chatgpt_semantic_ids = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_semantic_ids_{task}.p'))
-    chatgpt_probs = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_probs_{task}.p'))
-    feasibilities = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_feasibilities_{task}.p'))
+    retrieved_scores = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_retrieved_scores_{task}.p'))
+    retrieved_true_scores = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_retrieved_true_scores_{task}.p'))
+    queries = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_queries_{task}.p'))
+    answers = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_answers_{task}.p'))
+    chatgpt_true_scores = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_true_scores_{task}.p'))
+    chatgpt_answers = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_answers_{task}.p'))
+    chatgpt_passages = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_passages_{task}.p'))
+    chatgpt_semantics = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_semantics_{task}.p'))
+    chatgpt_occurances = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_occurances_{task}.p'))
+    chatgpt_semantic_ids = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_semantic_ids_{task}.p'))
+    chatgpt_probs = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_probs_{task}.p'))
+    feasibilities = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_feasibilities_{task}.p'))
 
-    retrieved_scores_unc = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_retrieved_scores_unc_{task}.p'))
-    retrieved_true_scores_unc = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_retrieved_true_scores_unc_{task}.p'))
-    queries_unc = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_queries_unc_{task}.p'))
-    answers_unc = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_answers_unc_{task}.p'))
-    passages_unc = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_passages_unc_{task}.p'))
-    chatgpt_true_scores_unc = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_true_scores_unc_{task}.p'))
-    chatgpt_answers_unc = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_answers_unc_{task}.p'))
-    chatgpt_occurances_unc = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_occurances_unc_{task}.p'))
-    chatgpt_semantic_ids_unc = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_semantic_ids_unc_{task}.p'))
-    chatgpt_probs_unc = trac_chatgpt.read_list(os.path.join(dir, f'chatgpt_probs_unc_{task}.p'))
+    retrieved_scores_unc = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_retrieved_scores_unc_{task}.p'))
+    retrieved_true_scores_unc = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_retrieved_true_scores_unc_{task}.p'))
+    queries_unc = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_queries_unc_{task}.p'))
+    answers_unc = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_answers_unc_{task}.p'))
+    passages_unc = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_passages_unc_{task}.p'))
+    chatgpt_true_scores_unc = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_true_scores_unc_{task}.p'))
+    chatgpt_answers_unc = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_answers_unc_{task}.p'))
+    chatgpt_occurances_unc = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_occurances_unc_{task}.p'))
+    chatgpt_semantic_ids_unc = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_semantic_ids_unc_{task}.p'))
+    chatgpt_probs_unc = traq_chatgpt.read_list(os.path.join(dir, f'chatgpt_probs_unc_{task}.p'))
 
     return feasibilities, retrieved_scores, retrieved_true_scores, queries, answers, chatgpt_true_scores, chatgpt_answers, chatgpt_passages, chatgpt_semantics, chatgpt_occurances, chatgpt_semantic_ids, chatgpt_probs, retrieved_scores_unc, retrieved_true_scores_unc, queries_unc, answers_unc, passages_unc, chatgpt_true_scores_unc, chatgpt_answers_unc, chatgpt_occurances_unc, chatgpt_semantic_ids_unc, chatgpt_probs_unc
 
@@ -100,24 +111,13 @@ def run(i, shared_includes, shared_semantic_counts, retrieved_thr, chatgpt_qa_th
                                         include = True
                                         break
         if cluster:
-            # semantic_set_ids, semantic_probs, item_occurance = \
-            #         compute_semantic_clusterring(
-            #             answers=semantics, 
-            #             question=query_tmp,
-            #             model=semantic_model,
-            #             tokenizer=semantic_tokenizer,
-            #     )
-            # semantic_counts.append(len(semantic_probs.keys()))
             unique_generated_texts, item_occurance = \
                 utils.unique_items(semantics)
             semantic_counts.append(len(unique_generated_texts))
         else:
             semantic_counts.append(len(semantics))
         semantics_total.append(semantic_set_ids)
-#         answer_counts.append(retrieved_count)
         includes.append(include)
-    # shared_includes += torch.sum(torch.tensor(includes))
-    # shared_semantic_counts += torch.sum(torch.tensor(semantic_counts))
     shared_includes.value += np.sum(includes)
     shared_semantic_counts.value += np.sum(semantic_counts)
 
@@ -135,28 +135,11 @@ def evaluate(
     test_chatgpt_semantic_ids_list = [test_chatgpt_semantic_ids[int(lens[i]):int(lens[i+1])] for i in range(kernel)]
     test_chatgpt_probs_list = [test_chatgpt_probs[int(lens[i]):int(lens[i+1])] for i in range(kernel)]
     test_answers_list = [test_answers[int(lens[i]):int(lens[i+1])] for i in range(kernel)]
-    
-    # processes = []
-    # shared_includes = torch.zeros(1).cuda()
-    # shared_includes.share_memory_()
-    # shared_semantic_counts = torch.zeros(1).cuda()
-    # shared_semantic_counts.share_memory_()
 
     processes = []
     shared_includes = Value('f', 0.0)
     shared_semantic_counts = Value('f', 0.0)
 
-    # for i in range(0, kernel):
-    #     p = multiprocessing.Process(target=run, args=(i, shared_includes, shared_semantic_counts))
-    #     processes.append(p)
-    #     p.start()
-
-    # for process in processes:
-    #     process.join()
-        
-    # return shared_includes.value/length, 0.0, shared_semantic_counts.value/length
-
-    # mp.set_start_method('spawn')
     for i in range(0, kernel):
         p = multiprocessing.Process(target=run, 
                        args=(
@@ -200,21 +183,12 @@ def run_vanila(i, shared_includes, shared_semantic_counts, test_queries_list,
                                 include = True
                 break
             if cluster:
-                # semantic_set_ids, semantic_probs, item_occurance = \
-                #     compute_semantic_clusterring(
-                #         answers=semantics, 
-                #         question=query_tmp,
-                #         model=semantic_model,
-                #         tokenizer=semantic_tokenizer,
-                # )
-                # semantic_counts.append(len(semantic_probs.keys()))
                 unique_generated_texts, item_occurance = \
                     utils.unique_items(semantics)
                 semantic_counts.append(len(unique_generated_texts))
             else:
                 semantic_counts.append(len(semantics))
             semantics_total.append(semantic_set_ids)
-    #         answer_counts.append(retrieved_count)
             includes.append(include)
         shared_includes.value += np.sum(includes)
         shared_semantic_counts.value += np.sum(semantic_counts)
@@ -494,33 +468,14 @@ if __name__ == '__main__':
         write_list(occurances_semantic, f'chatgpt_occurances_{task}_semantic.p')
         write_list(semantic_ids_semantic, f'chatgpt_semantic_ids_{task}_semantic.p')
         write_list(probs_semantic, f'chatgpt_probs_{task}_semantic.p')
-    
-    # chatgpt_true_scores_semantic = read_list(f'chatgpt_true_scores_{task}_semantic.p')
-    # chatgpt_answers_occurances_semantic = read_list(f'chatgpt_occurances_{task}_semantic.p')
-    # chatgpt_semantic_ids_semantic = read_list(f'chatgpt_semantic_ids_{task}_semantic.p')
-    # chatgpt_probs_semantic = read_list(f'chatgpt_probs_{task}_semantic.p')
-    chatgpt_true_scores = trac_chatgpt.read_list(os.path.join("../collected_data", f'chatgpt_true_scores_{task}_semantic.p'))
-    chatgpt_answers_occurances = trac_chatgpt.read_list(os.path.join("../collected_data", f'chatgpt_occurances_{task}_semantic.p'))
-    chatgpt_semantic_ids = trac_chatgpt.read_list(os.path.join("../collected_data", f'chatgpt_semantic_ids_{task}_semantic.p'))
-    chatgpt_probs = trac_chatgpt.read_list(os.path.join("../collected_data", f'chatgpt_probs_{task}_semantic.p'))
-    answers = trac_chatgpt.read_list(os.path.join("../collected_data", f'chatgpt_true_answers_{task}_semantic.p'))
-    
-    # for count, idx in enumerate(skip):
-    #     retrieved_scores.pop(idx - count)
-    #     retrieved_true_scores.pop(idx - count)
-    #     queries.pop(idx - count)
-    #     answers.pop(idx - count)
-    #     chatgpt_true_scores.pop(idx - count)
-    #     chatgpt_answers.pop(idx - count)
-    #     chatgpt_passages.pop(idx - count)
-    #     chatgpt_occurances.pop(idx - count)
-    #     chatgpt_semantic_ids.pop(idx - count)
-    #     chatgpt_probs.pop(idx - count)
-    
-    # chatgpt_true_scores = chatgpt_true_scores_semantic
+
+    chatgpt_true_scores = traq_chatgpt.read_list(os.path.join("../collected_data", f'chatgpt_true_scores_{task}_semantic.p'))
+    chatgpt_answers_occurances = traq_chatgpt.read_list(os.path.join("../collected_data", f'chatgpt_occurances_{task}_semantic.p'))
+    chatgpt_semantic_ids = traq_chatgpt.read_list(os.path.join("../collected_data", f'chatgpt_semantic_ids_{task}_semantic.p'))
+    chatgpt_probs = traq_chatgpt.read_list(os.path.join("../collected_data", f'chatgpt_probs_{task}_semantic.p'))
+    answers = traq_chatgpt.read_list(os.path.join("../collected_data", f'chatgpt_true_answers_{task}_semantic.p'))
 
     indices = np.arange(len(retrieved_true_scores))
-    # indices = np.arange(10)
     random.shuffle(indices)
     cal_first_indices = indices[:int(len(indices) * 0.3)]
     cal_second_indices = indices[int(len(indices) * 0.3) : int(len(indices) * 0.6)]

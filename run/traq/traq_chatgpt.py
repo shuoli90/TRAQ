@@ -1,17 +1,19 @@
 import os
 os.environ["CUDA_VISIBLE_DEVICES"]="4,5,6,7"
-from utils import utils
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+from misc import utils
 from rouge_score import rouge_scorer
 import random
 import numpy as np
 import torch
 import argparse
 torch.set_grad_enabled(False)
-from utils.pac_utils import find_maximum_train_error_allow
+from misc.pac_utils import find_maximum_train_error_allow
 import time
 import pickle
 import json
-from utils import tasks
+from misc import tasks
 from tqdm import tqdm
 from skopt.space import Real
 from skopt import gp_minimize
