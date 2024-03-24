@@ -1,6 +1,5 @@
 import os
 import sys
-import inspect
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 os.environ["CUDA_VISIBLE_DEVICES"]="2, 3"
 from misc import utils
@@ -10,7 +9,6 @@ import random
 import numpy as np
 import torch
 import argparse
-breakpoint()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Fine-tune llama-2 model on specific dataset")
@@ -25,7 +23,7 @@ if __name__ == '__main__':
     from haystack.nodes import DensePassageRetriever
     from haystack.document_stores.faiss import FAISSDocumentStore
     document_store_faiss = FAISSDocumentStore(faiss_index_path="bio_faiss_index.faiss")
-    reloaded_retriever = DensePassageRetriever.load(load_dir='./dpr_ft/bio_dpr_new', document_store=document_store_faiss)
+    reloaded_retriever = DensePassageRetriever.load(load_dir='../finetuned_models/bio_dpr', document_store=document_store_faiss)
     task='bio'
     questions, contexts, answers = tasks.bio_dpr(task=task).load_dataset()
 
