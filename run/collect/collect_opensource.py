@@ -87,7 +87,7 @@ if __name__ == '__main__':
     import json
     model_name = "NousResearch/Llama-2-7b-chat-hf"
     # Fine-tuned model name
-    new_model = f"../finetuned_models/llama-2-7b-shuo-{task}"
+    new_model = f"../finetuned_models/llama-2-7b-traq-{task}"
     # Reload model in FP16 and merge it with LoRA weights
     base_model = AutoModelForCausalLM.from_pretrained(
         model_name,
