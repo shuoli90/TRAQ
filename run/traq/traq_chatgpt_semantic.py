@@ -20,7 +20,7 @@ from skopt.utils import use_named_args
 import multiprocessing
 from multiprocessing import Value
 import run.traq.traq_chatgpt as traq_chatgpt
-
+import pickle
 
 def write_list(a_list, file_name):
     # store list in binary file so 'wb' mode
