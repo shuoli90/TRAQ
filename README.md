@@ -9,7 +9,7 @@ This is the project for trustworthy retrieval augmented chatbot (TRAQ). The orga
 - Folder *finetuned_models*: weights for finetuned models used in our submission
 - File *requirements.txt*: list important packages and corresponding versions
 
-Please download corresponding folders (except *collected results*) from this link: [TRAC](https://drive.google.com/drive/folders/1irO2-Fu-cpaDhOLEnpc7_-bOgdk0zvu3?usp=drive_link); and unzip to the root folder.
+Please download corresponding folders (except *collected results*) from this link: [TRAQ](https://drive.google.com/drive/folders/1irO2-Fu-cpaDhOLEnpc7_-bOgdk0zvu3?usp=drive_link); and unzip to the root folder.
 
 # Evaluate different methods
 ```
